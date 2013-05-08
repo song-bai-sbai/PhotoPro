@@ -10,8 +10,9 @@ MyFaceDetect::~MyFaceDetect(void)
 {
 }
 
-void MyFaceDetect::detectFace( Mat& img, CascadeClassifier& cascade, CascadeClassifier& nestedCascade, double scale, bool tryflip )
+void MyFaceDetect::detectFace( IplImage * imgsrc, CascadeClassifier& cascade, CascadeClassifier& nestedCascade, double scale, bool tryflip )
 {
+	Mat img(imgsrc,0);
 	int i = 0;
 	double t = 0;
 	vector<Rect> faces, faces2;
