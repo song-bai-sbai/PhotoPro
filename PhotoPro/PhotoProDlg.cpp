@@ -6,6 +6,8 @@
 #include "PhotoPro.h"
 #include "PhotoProDlg.h"
 #include "afxdialogex.h"
+#include "MyImgPro\MySmooth.h"
+#include "Resource.h"
 
 
 
@@ -54,6 +56,7 @@ CPhotoProDlg::CPhotoProDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CPhotoProDlg::IDD, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	src_img = NULL;
 }
 
 void CPhotoProDlg::DoDataExchange(CDataExchange* pDX)
@@ -66,6 +69,7 @@ BEGIN_MESSAGE_MAP(CPhotoProDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BUTTON1, &CPhotoProDlg::OnBnClickedShowIMG)
+	ON_BN_CLICKED(IDC_BUTTON2, &CPhotoProDlg::OnBnClickedButton2)
 END_MESSAGE_MAP()
 
 
@@ -158,14 +162,18 @@ HCURSOR CPhotoProDlg::OnQueryDragIcon()
 
 void CPhotoProDlg::OnBnClickedShowIMG()
 {
-	IplImage *image=NULL; 
-	if(image) cvReleaseImage(&image);
-	image = cvLoadImage("Pic/lena.jpg",1); 
-	DrawPicToHDC(image, IDC_ShowImg);
+	if(src_img!=NULL)
+	{
+		cvReleaseImage(&src_img);
+	}
+	src_img = cvLoadImage("Pic/lena.jpg",1);
+	DrawPicToHDC(src_img, IDC_ShowImg,0,0);
+
 }
 
-void CPhotoProDlg::DrawPicToHDC( IplImage *img, UINT ID )
+void CPhotoProDlg::DrawPicToHDC( IplImage *img, UINT ID , int pos_x, int pos_y)
 {
+	GetDlgItem(ID)->MoveWindow(pos_x,pos_y,img->width,img->height,FALSE);
 	CDC *pDC = GetDlgItem(ID)->GetDC();
 	HDC hDC= pDC->GetSafeHdc();
 	CRect rect;
@@ -174,4 +182,12 @@ void CPhotoProDlg::DrawPicToHDC( IplImage *img, UINT ID )
 	cimg.CopyOf( img ); // Copy IMG
 	cimg.DrawToHDC( hDC, &rect ); // Draw PIC
 	ReleaseDC( pDC );
+}
+
+
+void CPhotoProDlg::OnBnClickedButton2()
+{
+	MySmooth ms;
+	IplImage * dst =ms.doSmooth_Gaussian(src_img);
+	DrawPicToHDC(dst, IDC_DstImg,600,0);
 }
