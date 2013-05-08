@@ -105,6 +105,7 @@
   <ItemGroup>
     <ClInclude Include="CvvImage.h" />
     <ClInclude Include="MyImgPro\My2DPoint.h" />
+    <ClInclude Include="MyImgPro\MyBoundary.h" />
     <ClInclude Include="MyImgPro\MyBrit_Con.h" />
     <ClInclude Include="MyImgPro\MyClipping.h" />
     <ClInclude Include="MyImgPro\MyFaceDetect.h" />
@@ -125,6 +126,9 @@
   <ItemGroup>
     <ClCompile Include="CvvImage.cpp" />
     <ClCompile Include="MyImgPro\My2DPoint.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="MyImgPro\MyBoundary.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="MyImgPro\MyBri_Con.cpp">

@@ -85,6 +85,9 @@
     <ClInclude Include="CvvImage.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="MyImgPro\MyBoundary.h">
+      <Filter>MyImgPro.h</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PhotoPro.cpp">
@@ -134,6 +137,9 @@
     </ClCompile>
     <ClCompile Include="CvvImage.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MyImgPro\MyBoundary.cpp">
+      <Filter>MyImgPro.cpp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
