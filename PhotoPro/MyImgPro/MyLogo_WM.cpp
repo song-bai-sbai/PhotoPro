@@ -16,11 +16,13 @@ void MyLogo_WM::putText( const IplImage* src, IplImage *dst,string text )
 /************************************************************************/
 /* use img as water mark												*/
 /************************************************************************/
-void MyLogo_WM::putWM_img( Mat &img,Mat &wm_img, int pos_x, int pos_y, double alpha, double beta )
+void MyLogo_WM::putWM_img( IplImage *img,IplImage* wm_img, int pos_x, int pos_y, double alpha, double beta )
 {
-	if (!img.empty()&&!wm_img.empty())
+	Mat imgMat(img,0);
+	Mat wm_imgMat(wm_img,0);
+	if (!imgMat.empty()&&!wm_imgMat.empty())
 	{
-		Mat imgROI = img(Rect(pos_x,pos_y,wm_img.cols,wm_img.rows));
-		addWeighted(imgROI, alpha, wm_img, beta, 0, imgROI);// dst = alpha* roi+ beta* src+ gamma
+		Mat imgROI = imgMat(Rect(pos_x,pos_y,wm_imgMat.cols,wm_imgMat.rows));
+		addWeighted(imgROI, alpha, wm_imgMat, beta, 0, imgROI);// dst = alpha* roi+ beta* src+ gamma
 	} 
 }

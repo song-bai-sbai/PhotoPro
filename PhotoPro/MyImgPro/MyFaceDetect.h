@@ -12,7 +12,7 @@ class MyFaceDetect
 public:
 	MyFaceDetect(void);
 	~MyFaceDetect(void);
-	void detectFace( Mat& img, CascadeClassifier& cascade,
+	void detectFace( IplImage* img, CascadeClassifier& cascade,
 		CascadeClassifier& nestedCascade,
 		double scale, bool tryflip);
 };

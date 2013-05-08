@@ -76,7 +76,21 @@ IplImage *  MyResize::resize_CV_INTER_CUBIC(IplImage *src, double times)
 	return dst;
 }
 
-IplImage * MyResize::resize( IplImage *src, double times )
+IplImage * MyResize::resizeByTimes( IplImage *src, double times )
 {
 	return resize_CV_INTER_LINEAR(src,times);
+}
+
+IplImage * MyResize::resizeByValue( IplImage *src, int width, int height )
+{
+	if(src == NULL)
+	{
+		return NULL;
+	}  
+	CvSize dst_size; 
+	dst_size.width = width ;
+	dst_size.height = height;
+	IplImage *dst=cvCreateImage(dst_size,src->depth,src->nChannels);
+	cvResize(src,dst,CV_INTER_CUBIC);
+	return dst;
 }

@@ -9,12 +9,16 @@ public:
 	MyResize(void);
 	~MyResize(void);
 	/************************************************************************/
-	/* default resize, use inter liner                                      */
+	/* default resize, use inter liner , times>0                             */
 	/************************************************************************/
-	IplImage * resize(IplImage *src, double times);
+	IplImage * resizeByTimes(IplImage *src, double times);
 	IplImage *  resize_CV_INTER_NN(IplImage *src, double times);
 	IplImage * resize_CV_INTER_LINEAR(IplImage *src, double times);
 	IplImage *  resize_CV_INTER_AREA(IplImage *src, double times);
 	IplImage *  resize_CV_INTER_CUBIC(IplImage *src, double times);
+	/************************************************************************/
+	/* resize use inter liner                                             */
+	/************************************************************************/
+	IplImage * resizeByValue(IplImage *src, int width, int height);
 };
 
