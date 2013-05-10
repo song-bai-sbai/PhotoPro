@@ -88,6 +88,9 @@
     <ClInclude Include="MyImgPro\MyBoundary.h">
       <Filter>MyImgPro.h</Filter>
     </ClInclude>
+    <ClInclude Include="MyImgPro\MyAddMosaic.h">
+      <Filter>MyImgPro.h</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PhotoPro.cpp">
@@ -139,6 +142,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="MyImgPro\MyBoundary.cpp">
+      <Filter>MyImgPro.cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="MyImgPro\MyAddMosaic.cpp">
       <Filter>MyImgPro.cpp</Filter>
     </ClCompile>
   </ItemGroup>
