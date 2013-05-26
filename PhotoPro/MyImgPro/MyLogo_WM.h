@@ -17,5 +17,13 @@ public:
 	/* use img as water mark												*/
 	/************************************************************************/
 	void putWM_img(IplImage* img,IplImage *wm_img, int pos_x, int pos_y, double alpha=1.0, double beta=0.3);
+	/************************************************************************/
+	/* put logo no back                                                     */
+	/************************************************************************/
+	void putLogoNoBack(IplImage* img, IplImage *logo, int pos_x, int pos_y);
+	/************************************************************************/
+	/* put logo with back                                                   */
+	/************************************************************************/
+	void putLogoWithBack(IplImage* img, IplImage *logo, int pos_x, int pos_y);
 };
 
