@@ -35,4 +35,5 @@ public:
 	afx_msg void OnBnClickedShowIMG();
 	void DrawPicToHDC(IplImage *img, UINT ID,int pos_x, int pos_y);
 	afx_msg void OnBnClickedButton2();
+	afx_msg void OnBnClickedButton3();
 };

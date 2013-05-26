@@ -70,6 +70,7 @@ BEGIN_MESSAGE_MAP(CPhotoProDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BUTTON1, &CPhotoProDlg::OnBnClickedShowIMG)
 	ON_BN_CLICKED(IDC_BUTTON2, &CPhotoProDlg::OnBnClickedButton2)
+	ON_BN_CLICKED(IDC_BUTTON3, &CPhotoProDlg::OnBnClickedButton3)
 END_MESSAGE_MAP()
 
 
@@ -190,4 +191,16 @@ void CPhotoProDlg::OnBnClickedButton2()
 	MySmooth ms;
 	IplImage * dst =ms.doSmooth_Gaussian(src_img);
 	DrawPicToHDC(dst, IDC_DstImg,600,0);
+}
+
+
+void CPhotoProDlg::OnBnClickedButton3()
+{
+	CFileDialog filedialog(TRUE, NULL, NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT|OFN_ALLOWMULTISELECT,
+		NULL, this);
+	if(IDOK==filedialog.DoModal())
+	{
+		
+		AfxMessageBox(filedialog.GetFileName());
+	}
 }
