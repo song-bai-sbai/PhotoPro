@@ -56,6 +56,8 @@ CPhotoProDlg::CPhotoProDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CPhotoProDlg::IDD, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	m_HArrow = AfxGetApp()->LoadStandardCursor(IDC_ARROW);
+	m_HCross = AfxGetApp()->LoadStandardCursor(IDC_CROSS);
 	src_img = NULL;
 }
 
@@ -70,7 +72,9 @@ BEGIN_MESSAGE_MAP(CPhotoProDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BUTTON1, &CPhotoProDlg::OnBnClickedShowIMG)
 	ON_BN_CLICKED(IDC_BUTTON2, &CPhotoProDlg::OnBnClickedButton2)
-	ON_BN_CLICKED(IDC_BUTTON3, &CPhotoProDlg::OnBnClickedButton3)
+	ON_BN_CLICKED(IDC_BUTTON3, &CPhotoProDlg::OnBnClickedLoadIMG)
+	ON_WM_MOUSEMOVE()
+	ON_BN_CLICKED(IDC_BUTTON4, &CPhotoProDlg::OnBnClickedSaveImg)
 END_MESSAGE_MAP()
 
 
@@ -163,12 +167,13 @@ HCURSOR CPhotoProDlg::OnQueryDragIcon()
 
 void CPhotoProDlg::OnBnClickedShowIMG()
 {
-	if(src_img!=NULL)
+	if (src_img!=NULL)
 	{
-		cvReleaseImage(&src_img);
+		cvNamedWindow( "Image", 1 );
+		cvShowImage( "Image", src_img );
+		cvWaitKey(0); 
+		cvDestroyWindow( "Image" );
 	}
-	src_img = cvLoadImage("Pic/lena.jpg",1);
-	DrawPicToHDC(src_img, IDC_ShowImg,0,0);
 
 }
 
@@ -179,9 +184,9 @@ void CPhotoProDlg::DrawPicToHDC( IplImage *img, UINT ID , int pos_x, int pos_y)
 	HDC hDC= pDC->GetSafeHdc();
 	CRect rect;
 	GetDlgItem(ID)->GetClientRect(&rect);
-	CvvImage cimg;
-	cimg.CopyOf( img ); // Copy IMG
-	cimg.DrawToHDC( hDC, &rect ); // Draw PIC
+	CvvImage cvvimamg;
+	cvvimamg.CopyOf( img ); // Copy IMG
+	cvvimamg.DrawToHDC( hDC, &rect ); // Draw PIC
 	ReleaseDC( pDC );
 }
 
@@ -194,13 +199,67 @@ void CPhotoProDlg::OnBnClickedButton2()
 }
 
 
-void CPhotoProDlg::OnBnClickedButton3()
+void CPhotoProDlg::OnBnClickedLoadIMG()//load img
 {
 	CFileDialog filedialog(TRUE, NULL, NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT|OFN_ALLOWMULTISELECT,
 		NULL, this);
 	if(IDOK==filedialog.DoModal())
 	{
-		
-		AfxMessageBox(filedialog.GetFileName());
+		if(src_img!=NULL)
+		{
+			cvReleaseImage(&src_img);
+		}
+		src_img = cvLoadImage(filedialog.GetPathName(),1);
+		DrawSrcImg(src_img, IDC_SrcImg);
+	}
+}
+
+
+void CPhotoProDlg::OnMouseMove(UINT nFlags, CPoint point)
+{
+	if (point.x>0&&point.x<100&&point.y>0&&point.y<100)
+	{
+		SetCursor(m_HCross);
+	}
+	else
+	{
+        SetCursor(m_HArrow);
+	}
+	CDialogEx::OnMouseMove(nFlags, point);
+}
+
+void CPhotoProDlg::DrawSrcImg(IplImage *img, UINT ID)//max size 300*300
+{
+
+	if (img->width>300||img->height>300)
+	{
+		int l_size = (img->width>img->height)?img->width:img->height;
+		float times = (float)300/l_size;
+		GetDlgItem(ID)->MoveWindow(10,10,img->width*times,img->height*times,FALSE);
+	}
+	else
+	{
+		GetDlgItem(ID)->MoveWindow(10,10,img->width,img->height,FALSE);
+	}
+	
+	CDC *pDC = GetDlgItem(ID)->GetDC();
+	HDC hDC= pDC->GetSafeHdc();
+	CRect rect;
+	GetDlgItem(ID)->GetClientRect(&rect);
+	CvvImage cimg;
+	cimg.CopyOf( img ); // Copy IMG
+	cimg.DrawToHDC( hDC, &rect ); // Draw PIC
+	ReleaseDC( pDC );
+}
+
+
+void CPhotoProDlg::OnBnClickedSaveImg()
+{
+	CFileDialog filedialog(FALSE, NULL, NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT|OFN_ALLOWMULTISELECT,
+		NULL, this);
+	if(IDOK==filedialog.DoModal())
+	{
+		CvvImage cimg;
+		cimg.Save(filedialog.GetPathName());
 	}
 }
