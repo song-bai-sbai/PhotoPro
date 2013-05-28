@@ -29,6 +29,7 @@ protected:
 	IplImage * dst_img;
 	HCURSOR m_HArrow;
 	HCURSOR m_HCross;
+	bool isChooseArea;
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
@@ -37,10 +38,12 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedShowIMG();
-	void DrawPicToHDC(IplImage *img, UINT ID,int pos_x, int pos_y);
-	void DrawSrcImg(IplImage *img, UINT ID);
+	void DrawDstImg();
+	void DrawSrcImg();
+	void UpdateDstImg(IplImage * modifiedImg);
 	afx_msg void OnBnClickedButton2();
 	afx_msg void OnBnClickedLoadIMG();
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg void OnBnClickedSaveImg();
+	afx_msg void OnBnClickedButton5();
 };

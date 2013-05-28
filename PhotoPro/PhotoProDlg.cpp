@@ -15,7 +15,14 @@
 #define new DEBUG_NEW
 #endif
 
-
+#define SRC_X 10
+#define SRC_Y 10
+#define SRC_WIDTH 300
+#define SRC_HEIGHT 300
+#define DST_X 400
+#define DST_Y 10
+#define DST_WIDTH 600
+#define DST_HEIGHT 600
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
 class CAboutDlg : public CDialogEx
@@ -23,13 +30,13 @@ class CAboutDlg : public CDialogEx
 public:
 	CAboutDlg();
 
-// 对话框数据
+	// 对话框数据
 	enum { IDD = IDD_ABOUTBOX };
 
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
-// 实现
+	// 实现
 protected:
 	DECLARE_MESSAGE_MAP()
 };
@@ -59,6 +66,9 @@ CPhotoProDlg::CPhotoProDlg(CWnd* pParent /*=NULL*/)
 	m_HArrow = AfxGetApp()->LoadStandardCursor(IDC_ARROW);
 	m_HCross = AfxGetApp()->LoadStandardCursor(IDC_CROSS);
 	src_img = NULL;
+	dst_img = NULL;
+	temp_img = NULL;
+	isChooseArea =  false;
 }
 
 void CPhotoProDlg::DoDataExchange(CDataExchange* pDX)
@@ -75,6 +85,7 @@ BEGIN_MESSAGE_MAP(CPhotoProDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON3, &CPhotoProDlg::OnBnClickedLoadIMG)
 	ON_WM_MOUSEMOVE()
 	ON_BN_CLICKED(IDC_BUTTON4, &CPhotoProDlg::OnBnClickedSaveImg)
+	ON_BN_CLICKED(IDC_BUTTON5, &CPhotoProDlg::OnBnClickedButton5)
 END_MESSAGE_MAP()
 
 
@@ -177,32 +188,34 @@ void CPhotoProDlg::OnBnClickedShowIMG()
 
 }
 
-void CPhotoProDlg::DrawPicToHDC( IplImage *img, UINT ID , int pos_x, int pos_y)
+void CPhotoProDlg::DrawDstImg()
 {
-	GetDlgItem(ID)->MoveWindow(pos_x,pos_y,img->width,img->height,FALSE);
+	UINT ID = IDC_DstImg;
+	if (dst_img->width>DST_WIDTH||dst_img->height>DST_HEIGHT)
+	{
+		int l_size = (dst_img->width>dst_img->height)?dst_img->width:dst_img->height;
+		float times = (float)DST_WIDTH/l_size;
+		GetDlgItem(ID)->MoveWindow(DST_X,DST_Y,dst_img->width*times,dst_img->height*times,FALSE);
+	}
+	else
+	{
+		GetDlgItem(ID)->MoveWindow(DST_X,DST_Y,dst_img->width,dst_img->height,FALSE);
+	}
+
 	CDC *pDC = GetDlgItem(ID)->GetDC();
 	HDC hDC= pDC->GetSafeHdc();
 	CRect rect;
 	GetDlgItem(ID)->GetClientRect(&rect);
 	CvvImage cvvimamg;
-	cvvimamg.CopyOf( img ); // Copy IMG
+	cvvimamg.CopyOf( dst_img ); // Copy IMG
 	cvvimamg.DrawToHDC( hDC, &rect ); // Draw PIC
 	ReleaseDC( pDC );
 }
 
-
-void CPhotoProDlg::OnBnClickedButton2()
-{
-	MySmooth ms;
-	IplImage * dst =ms.doSmooth_Gaussian(src_img);
-	DrawPicToHDC(dst, IDC_DstImg,600,0);
-}
-
-
 void CPhotoProDlg::OnBnClickedLoadIMG()//load img
 {
-	CFileDialog filedialog(TRUE, NULL, NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT|OFN_ALLOWMULTISELECT,
-		NULL, this);
+	CFileDialog filedialog(TRUE, NULL, NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
+		"JPG,JPEG,PNG,BMP (*.jpg;*.jpeg;*.png;*.bmp)|*.jpg;*.jpeg;*.png;*.bmp|All Files (*.*)|*.*||", this);
 	if(IDOK==filedialog.DoModal())
 	{
 		if(src_img!=NULL)
@@ -210,44 +223,54 @@ void CPhotoProDlg::OnBnClickedLoadIMG()//load img
 			cvReleaseImage(&src_img);
 		}
 		src_img = cvLoadImage(filedialog.GetPathName(),1);
-		DrawSrcImg(src_img, IDC_SrcImg);
+		dst_img = cvCreateImage(cvGetSize(src_img),IPL_DEPTH_8U,3);
+		dst_img = cvCloneImage(src_img);
+
+		temp_img = cvCreateImage(cvGetSize(src_img),IPL_DEPTH_8U,3);
+		temp_img = cvCloneImage(src_img);
+		DrawSrcImg();
+		DrawDstImg();
 	}
 }
 
 
 void CPhotoProDlg::OnMouseMove(UINT nFlags, CPoint point)
 {
-	if (point.x>0&&point.x<100&&point.y>0&&point.y<100)
+	if (isChooseArea)
 	{
-		SetCursor(m_HCross);
+		if (point.x>DST_X&&point.x<DST_X+DST_WIDTH&&point.y>DST_Y&&point.y<DST_Y+DST_HEIGHT)
+		{
+			SetCursor(m_HCross);
+		}
+		else
+		{
+			SetCursor(m_HArrow);
+		}
 	}
-	else
-	{
-        SetCursor(m_HArrow);
-	}
+
 	CDialogEx::OnMouseMove(nFlags, point);
 }
 
-void CPhotoProDlg::DrawSrcImg(IplImage *img, UINT ID)//max size 300*300
+void CPhotoProDlg::DrawSrcImg()//max size 300*300
 {
-
-	if (img->width>300||img->height>300)
+	UINT ID = IDC_SrcImg;
+	if (src_img->width>SRC_WIDTH||src_img->height>SRC_HEIGHT)
 	{
-		int l_size = (img->width>img->height)?img->width:img->height;
-		float times = (float)300/l_size;
-		GetDlgItem(ID)->MoveWindow(10,10,img->width*times,img->height*times,FALSE);
+		int l_size = (src_img->width>src_img->height)?src_img->width:src_img->height;
+		float times = (float)SRC_WIDTH/l_size;
+		GetDlgItem(ID)->MoveWindow(SRC_X,SRC_Y,src_img->width*times,src_img->height*times,FALSE);
 	}
 	else
 	{
-		GetDlgItem(ID)->MoveWindow(10,10,img->width,img->height,FALSE);
+		GetDlgItem(ID)->MoveWindow(SRC_X,SRC_Y,src_img->width,src_img->height,FALSE);
 	}
-	
+
 	CDC *pDC = GetDlgItem(ID)->GetDC();
 	HDC hDC= pDC->GetSafeHdc();
 	CRect rect;
 	GetDlgItem(ID)->GetClientRect(&rect);
 	CvvImage cimg;
-	cimg.CopyOf( img ); // Copy IMG
+	cimg.CopyOf( src_img ); // Copy IMG
 	cimg.DrawToHDC( hDC, &rect ); // Draw PIC
 	ReleaseDC( pDC );
 }
@@ -255,11 +278,54 @@ void CPhotoProDlg::DrawSrcImg(IplImage *img, UINT ID)//max size 300*300
 
 void CPhotoProDlg::OnBnClickedSaveImg()
 {
-	CFileDialog filedialog(FALSE, NULL, NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT|OFN_ALLOWMULTISELECT,
-		NULL, this);
-	if(IDOK==filedialog.DoModal())
+	if (dst_img!=NULL)
 	{
-		CvvImage cimg;
-		cimg.Save(filedialog.GetPathName());
+		CFileDialog filedialog(FALSE, "jpg", " ", OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
+			"JPG (*.jpg)| *.jpg|JPEG (*.jpeg)| *.jpeg|PNG (*.png)| *.png|BMP (*.bmp)| *.bmp||", this);
+		if(IDOK==filedialog.DoModal())
+		{
+			CvvImage cimg;
+			cimg.CopyOf(dst_img);
+			cimg.Save(filedialog.GetPathName());
+		}
 	}
+	else
+	{
+		AfxMessageBox("请先载入一张照片");
+	}	
+}
+
+void CPhotoProDlg::UpdateDstImg(IplImage * modifiedImg)
+{
+	if (modifiedImg== NULL)
+	{
+		AfxMessageBox("修改失败。");
+	}
+	else if (src_img ==NULL)
+	{
+		AfxMessageBox("请先载入一张照片");
+	}
+	else
+	{
+		cvReleaseImage(&temp_img);
+		temp_img = cvCreateImage(cvGetSize(dst_img),IPL_DEPTH_8U,3);
+		temp_img = cvCloneImage(dst_img);
+		cvReleaseImage(&dst_img);
+		dst_img = cvCreateImage(cvGetSize(modifiedImg),IPL_DEPTH_8U,3);
+		dst_img = cvCloneImage(modifiedImg);
+		DrawDstImg();
+		AfxMessageBox("修改完成。");
+	}
+}
+
+void CPhotoProDlg::OnBnClickedButton2()
+{
+	MySmooth ms;
+	IplImage * modifiedImg =ms.doSmooth_Gaussian(src_img);
+	UpdateDstImg(modifiedImg);
+}
+
+void CPhotoProDlg::OnBnClickedButton5()
+{
+	isChooseArea = true;
 }
