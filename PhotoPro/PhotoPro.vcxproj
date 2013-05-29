@@ -118,6 +118,7 @@
     <ClInclude Include="MyImgPro\MyRotate.h" />
     <ClInclude Include="MyImgPro\MySharp.h" />
     <ClInclude Include="MyImgPro\MySmooth.h" />
+    <ClInclude Include="PhotoInfo.h" />
     <ClInclude Include="PhotoPro.h" />
     <ClInclude Include="PhotoProDlg.h" />
     <ClInclude Include="Resource.h" />
@@ -168,6 +169,7 @@
     <ClCompile Include="MyImgPro\MySmooth.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="PhotoInfo.cpp" />
     <ClCompile Include="PhotoPro.cpp" />
     <ClCompile Include="PhotoProDlg.cpp" />
     <ClCompile Include="stdafx.cpp">

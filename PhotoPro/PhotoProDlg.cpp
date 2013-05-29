@@ -8,6 +8,7 @@
 #include "afxdialogex.h"
 #include "MyImgPro\MySmooth.h"
 #include "Resource.h"
+#include "MyImgPro\MyResize.h"
 
 
 
@@ -69,6 +70,9 @@ CPhotoProDlg::CPhotoProDlg(CWnd* pParent /*=NULL*/)
 	dst_img = NULL;
 	temp_img = NULL;
 	isChooseArea =  false;
+	isBeginDraw = false;
+	SetRectEmpty(&m_recDrawing);
+	m_penDrawing = ::CreatePen(PS_DASH, 1, RGB(255, 0, 0));
 }
 
 void CPhotoProDlg::DoDataExchange(CDataExchange* pDX)
@@ -86,6 +90,8 @@ BEGIN_MESSAGE_MAP(CPhotoProDlg, CDialogEx)
 	ON_WM_MOUSEMOVE()
 	ON_BN_CLICKED(IDC_BUTTON4, &CPhotoProDlg::OnBnClickedSaveImg)
 	ON_BN_CLICKED(IDC_BUTTON5, &CPhotoProDlg::OnBnClickedButton5)
+	ON_WM_LBUTTONDOWN()
+	ON_WM_LBUTTONUP()
 END_MESSAGE_MAP()
 
 
@@ -188,69 +194,6 @@ void CPhotoProDlg::OnBnClickedShowIMG()
 
 }
 
-void CPhotoProDlg::DrawDstImg()
-{
-	UINT ID = IDC_DstImg;
-	if (dst_img->width>DST_WIDTH||dst_img->height>DST_HEIGHT)
-	{
-		int l_size = (dst_img->width>dst_img->height)?dst_img->width:dst_img->height;
-		float times = (float)DST_WIDTH/l_size;
-		GetDlgItem(ID)->MoveWindow(DST_X,DST_Y,dst_img->width*times,dst_img->height*times,FALSE);
-	}
-	else
-	{
-		GetDlgItem(ID)->MoveWindow(DST_X,DST_Y,dst_img->width,dst_img->height,FALSE);
-	}
-
-	CDC *pDC = GetDlgItem(ID)->GetDC();
-	HDC hDC= pDC->GetSafeHdc();
-	CRect rect;
-	GetDlgItem(ID)->GetClientRect(&rect);
-	CvvImage cvvimamg;
-	cvvimamg.CopyOf( dst_img ); // Copy IMG
-	cvvimamg.DrawToHDC( hDC, &rect ); // Draw PIC
-	ReleaseDC( pDC );
-}
-
-void CPhotoProDlg::OnBnClickedLoadIMG()//load img
-{
-	CFileDialog filedialog(TRUE, NULL, NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
-		"JPG,JPEG,PNG,BMP (*.jpg;*.jpeg;*.png;*.bmp)|*.jpg;*.jpeg;*.png;*.bmp|All Files (*.*)|*.*||", this);
-	if(IDOK==filedialog.DoModal())
-	{
-		if(src_img!=NULL)
-		{
-			cvReleaseImage(&src_img);
-		}
-		src_img = cvLoadImage(filedialog.GetPathName(),1);
-		dst_img = cvCreateImage(cvGetSize(src_img),IPL_DEPTH_8U,3);
-		dst_img = cvCloneImage(src_img);
-
-		temp_img = cvCreateImage(cvGetSize(src_img),IPL_DEPTH_8U,3);
-		temp_img = cvCloneImage(src_img);
-		DrawSrcImg();
-		DrawDstImg();
-	}
-}
-
-
-void CPhotoProDlg::OnMouseMove(UINT nFlags, CPoint point)
-{
-	if (isChooseArea)
-	{
-		if (point.x>DST_X&&point.x<DST_X+DST_WIDTH&&point.y>DST_Y&&point.y<DST_Y+DST_HEIGHT)
-		{
-			SetCursor(m_HCross);
-		}
-		else
-		{
-			SetCursor(m_HArrow);
-		}
-	}
-
-	CDialogEx::OnMouseMove(nFlags, point);
-}
-
 void CPhotoProDlg::DrawSrcImg()//max size 300*300
 {
 	UINT ID = IDC_SrcImg;
@@ -273,6 +216,85 @@ void CPhotoProDlg::DrawSrcImg()//max size 300*300
 	cimg.CopyOf( src_img ); // Copy IMG
 	cimg.DrawToHDC( hDC, &rect ); // Draw PIC
 	ReleaseDC( pDC );
+}
+
+void CPhotoProDlg::DrawDstImg()
+{
+	UINT ID = IDC_DstImg;
+	if (dst_img->width>DST_WIDTH||dst_img->height>DST_HEIGHT)
+	{
+		int l_size = (dst_img->width>dst_img->height)?dst_img->width:dst_img->height;
+		float times = (float)DST_WIDTH/l_size;
+		pi.setDstImg_Times(times);
+		pi.setResizeWidth(dst_img->width*times);
+		pi.setResizeHeight(dst_img->height*times);
+		GetDlgItem(ID)->MoveWindow(DST_X,DST_Y,pi.getResizeWidth(),pi.getResizeHeight(),FALSE);
+		//GetDlgItem(ID)->SetWindowPos(NULL,DST_X,DST_Y,pi.getResizeWidth(),pi.getResizeHeight(),SWP_NOMOVE);
+	}
+	else
+	{
+		pi.setDstImg_Times(1);
+		pi.setResizeWidth(dst_img->width);
+		pi.setResizeHeight(dst_img->height);
+		GetDlgItem(ID)->MoveWindow(DST_X,DST_Y,dst_img->width,dst_img->height,FALSE);
+	}
+
+	CDC *pDC = GetDlgItem(ID)->GetDC();
+	HDC hDC= pDC->GetSafeHdc();
+	CRect rect;
+	GetDlgItem(ID)->GetClientRect(&rect);
+	CvvImage cvvimamg;
+	cvvimamg.CopyOf( dst_img ); // Copy IMG
+	cvvimamg.DrawToHDC( hDC, &rect ); // Draw PIC
+	ReleaseDC( pDC );
+	this->OnPaint();
+}
+
+void CPhotoProDlg::OnBnClickedLoadIMG()//load img
+{
+	CFileDialog filedialog(TRUE, NULL, NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
+		"JPG,JPEG,PNG,BMP (*.jpg;*.jpeg;*.png;*.bmp)|*.jpg;*.jpeg;*.png;*.bmp|All Files (*.*)|*.*||", this);
+	if(IDOK==filedialog.DoModal())
+	{
+		if(src_img!=NULL)
+		{
+			cvReleaseImage(&src_img);
+		}
+		src_img = cvLoadImage(filedialog.GetPathName(),1);
+		dst_img = cvCreateImage(cvGetSize(src_img),IPL_DEPTH_8U,3);
+		dst_img = cvCloneImage(src_img);
+
+		temp_img = cvCreateImage(cvGetSize(src_img),IPL_DEPTH_8U,3);
+		temp_img = cvCloneImage(src_img);
+		GetDlgItem(IDC_SrcImg)->Invalidate();
+		GetDlgItem(IDC_DstImg)->Invalidate();
+		this->UpdateWindow();
+		DrawSrcImg();
+		DrawDstImg();
+	}
+}
+
+
+void CPhotoProDlg::OnMouseMove(UINT nFlags, CPoint point)
+{
+	if (isChooseArea)
+	{
+		if (point.x>DST_X&&point.x<DST_X+pi.getResizeWidth()&&point.y>DST_Y&&point.y<DST_Y+pi.getResizeHeight())
+		{
+			SetCursor(m_HCross);
+		}
+		else
+		{
+			SetCursor(m_HArrow);
+		}
+		if (isBeginDraw)
+		{
+			drawRectangle(point);
+		}
+		
+	}
+
+	CDialogEx::OnMouseMove(nFlags, point);
 }
 
 
@@ -306,13 +328,15 @@ void CPhotoProDlg::UpdateDstImg(IplImage * modifiedImg)
 		AfxMessageBox("请先载入一张照片");
 	}
 	else
-	{
+	{	
 		cvReleaseImage(&temp_img);
 		temp_img = cvCreateImage(cvGetSize(dst_img),IPL_DEPTH_8U,3);
 		temp_img = cvCloneImage(dst_img);
 		cvReleaseImage(&dst_img);
 		dst_img = cvCreateImage(cvGetSize(modifiedImg),IPL_DEPTH_8U,3);
 		dst_img = cvCloneImage(modifiedImg);
+		GetDlgItem(IDC_DstImg)->Invalidate();
+		this->UpdateWindow();
 		DrawDstImg();
 		AfxMessageBox("修改完成。");
 	}
@@ -321,11 +345,66 @@ void CPhotoProDlg::UpdateDstImg(IplImage * modifiedImg)
 void CPhotoProDlg::OnBnClickedButton2()
 {
 	MySmooth ms;
-	IplImage * modifiedImg =ms.doSmooth_Gaussian(src_img);
+	//IplImage * modifiedImg =ms.doSmooth_Gaussian(src_img);
+	MyResize mr;
+	IplImage * modifiedImg = mr.resizeByTimes(src_img,0.5);
 	UpdateDstImg(modifiedImg);
 }
 
 void CPhotoProDlg::OnBnClickedButton5()
 {
 	isChooseArea = true;
+}
+
+
+void CPhotoProDlg::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	if (isChooseArea==true)
+	{
+		isBeginDraw=true;
+		m_ptBegin = point;
+		pi.setStart_pos(point);
+	}
+
+	CDialogEx::OnLButtonDown(nFlags, point);
+}
+
+
+void CPhotoProDlg::OnLButtonUp(UINT nFlags, CPoint point)
+{
+	if (isChooseArea==true&&isBeginDraw==true)
+	{
+		isChooseArea = false;
+		isBeginDraw = false;
+		pi.setEnd_pos(point);
+		//AfxMessageBox(pi.getStart_pos().x );
+		//	/*+" y = "+ pi.getStart_pos().y+"  n"
+		//	+"end : x = "+pi.getEnd_pos().x+" y = "+ pi.getEnd_pos().y);*/
+	}
+
+	CDialogEx::OnLButtonUp(nFlags, point);
+}
+
+void CPhotoProDlg::drawRectangle(CPoint point)
+{
+	CDC* pDC = GetDC();
+	if (pDC) 
+	{
+		HDC hdc = pDC->m_hDC;
+
+		// set the drawing mode and the drawing pen.
+		int nDrawMode = ::SetROP2(hdc, R2_NOTXORPEN);
+		HPEN hOldPen = (HPEN)::SelectObject(hdc, m_penDrawing);
+
+		// erase the last rect
+		Rectangle(hdc, m_recDrawing.left, m_recDrawing.top, m_recDrawing.right, m_recDrawing.bottom);
+		SetRect(&m_recDrawing, m_ptBegin.x, m_ptBegin.y, point.x, point.y);
+		Rectangle(hdc, m_recDrawing.left, m_recDrawing.top, m_recDrawing.right, m_recDrawing.bottom);
+
+		// restore the dc
+		SetROP2(hdc, nDrawMode);
+		SelectObject(hdc, hOldPen);
+
+		ReleaseDC(pDC);
+	}
 }

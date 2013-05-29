@@ -6,6 +6,7 @@
 #include <core\types_c.h>
 #include "CvvImage.h"
 #include "Resource.h"
+#include "PhotoInfo.h"
 
 // CPhotoProDlg 对话框
 class CPhotoProDlg : public CDialogEx
@@ -30,6 +31,12 @@ protected:
 	HCURSOR m_HArrow;
 	HCURSOR m_HCross;
 	bool isChooseArea;
+	bool isBeginDraw;
+	PhotoInfo pi;
+	RECT    m_recDrawing;
+	HPEN    m_penDrawing;
+	POINT   m_ptBegin;
+
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
@@ -37,13 +44,18 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnBnClickedShowIMG();
+	
 	void DrawDstImg();
 	void DrawSrcImg();
 	void UpdateDstImg(IplImage * modifiedImg);
+	void drawRectangle(CPoint point);
+	
+	afx_msg void OnBnClickedShowIMG();
 	afx_msg void OnBnClickedButton2();
 	afx_msg void OnBnClickedLoadIMG();
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg void OnBnClickedSaveImg();
 	afx_msg void OnBnClickedButton5();
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 };

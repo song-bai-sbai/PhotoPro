@@ -91,6 +91,9 @@
     <ClInclude Include="MyImgPro\MyAddMosaic.h">
       <Filter>MyImgPro.h</Filter>
     </ClInclude>
+    <ClInclude Include="PhotoInfo.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PhotoPro.cpp">
@@ -146,6 +149,9 @@
     </ClCompile>
     <ClCompile Include="MyImgPro\MyAddMosaic.cpp">
       <Filter>MyImgPro.cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="PhotoInfo.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
