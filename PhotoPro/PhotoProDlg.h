@@ -63,4 +63,5 @@ public:
 	afx_msg void OnBnClickedAllSharp();
 	afx_msg void OnBnClickedAllBlur();
 	afx_msg void OnBnClickedButton10();
+	afx_msg void OnBnClickedRepair();
 };

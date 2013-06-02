@@ -12,6 +12,7 @@
 #include "ChangePoint.h"
 #include "MyImgPro\MySharp.h"
 #include "MyImgPro\MyAddMosaic.h"
+#include "..\..\opentest\opentest\MyInpaintig.h"
 
 
 
@@ -111,6 +112,7 @@ BEGIN_MESSAGE_MAP(CPhotoProDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON7, &CPhotoProDlg::OnBnClickedAllSharp)
 	ON_BN_CLICKED(IDC_BUTTON13, &CPhotoProDlg::OnBnClickedAllBlur)
 	ON_BN_CLICKED(IDC_BUTTON10, &CPhotoProDlg::OnBnClickedButton10)
+	ON_BN_CLICKED(IDC_BUTTON11, &CPhotoProDlg::OnBnClickedRepair)
 END_MESSAGE_MAP()
 
 
@@ -449,6 +451,7 @@ void CPhotoProDlg::OnBnClickedDoSmooth()
 	}
 	else
 	{
+		AfxMessageBox("请选择要模糊化的区域。");
 		isChooseArea = true;
 		img_OP = DOSMOOTH;
 	}
@@ -476,6 +479,7 @@ void CPhotoProDlg::OnBnClickedAddMosaic()
 	}
 	else
 	{
+		AfxMessageBox("请选择要打马赛克的区域。");
 		isChooseArea = true;
 		img_OP = ADDMOSAIC;
 	}
@@ -489,10 +493,27 @@ void CPhotoProDlg::OnBnClickedUsmSharp()
 	}
 	else
 	{
+		AfxMessageBox("请选择要锐化的区域。");
 		isChooseArea = true;
 		img_OP = USMSHARP;
 	}
 }
+
+
+void CPhotoProDlg::OnBnClickedRepair()
+{
+	if (dst_img == NULL)
+	{
+		AfxMessageBox("请先载入一张照片。");
+	}
+	else
+	{
+		AfxMessageBox("请选择要修复的区域。");
+		isChooseArea = true;
+		img_OP = REPAIRIMG;
+	}
+}
+
 void CPhotoProDlg::doOperation( int op, CPoint sp, CPoint ep )
 {
 
@@ -520,6 +541,11 @@ void CPhotoProDlg::doOperation( int op, CPoint sp, CPoint ep )
 			MyAddMosaic mam;
 			modifiedImg = mam.addMosaic(dst_img,cp.newSp.x,cp.newSp.y,cp.width,cp.height);
 		}
+		if (op == REPAIRIMG)
+		{
+			MyInpaintig mi;
+			modifiedImg = mi.inpaintig(dst_img,sp.x,sp.y,sp.x,ep.y,ep.x,sp.y,ep.x,ep.y);
+		}
 		UpdateDstImg(modifiedImg);
 	}
 
@@ -533,3 +559,4 @@ void CPhotoProDlg::OnBnClickedButton10()
 {
 	
 }
+
