@@ -11,6 +11,8 @@ public:
 	/************************************************************************/
 	/* usmSahrp                                                             */
 	/************************************************************************/
-	IplImage * usmSharp(const IplImage*src, float amount, int radius, uchar threshold,float contrast=3);
+	IplImage * usmSharp(const IplImage*src, float amount=40, int radius=13, uchar threshold=2,float contrast=3);
+
+	IplImage * partUsmSharp(IplImage*src,int x, int y, int width, int height, float amount=40, int radius=13, uchar threshold=2,float contrast=3);
 };
 

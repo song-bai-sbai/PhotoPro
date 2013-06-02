@@ -9,6 +9,8 @@
 #include "MyImgPro\MySmooth.h"
 #include "Resource.h"
 #include "MyImgPro\MyResize.h"
+#include "ChangePoint.h"
+#include "MyImgPro\MySharp.h"
 
 
 
@@ -24,6 +26,14 @@
 #define DST_Y 10
 #define DST_WIDTH 600
 #define DST_HEIGHT 600
+
+//Operation
+#define ADDMOSAIC 101
+#define CLIPPING 102
+#define REPAIRIMG 103
+#define REMOVELINE 104
+#define USMSHARP 105
+#define DOSMOOTH 106
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
 class CAboutDlg : public CDialogEx
@@ -71,8 +81,11 @@ CPhotoProDlg::CPhotoProDlg(CWnd* pParent /*=NULL*/)
 	temp_img = NULL;
 	isChooseArea =  false;
 	isBeginDraw = false;
+	img_OP = 0;
 	SetRectEmpty(&m_recDrawing);
 	m_penDrawing = ::CreatePen(PS_DASH, 1, RGB(255, 0, 0));
+	pi.setDST_X(DST_X);
+	pi.setDST_Y(DST_Y);
 }
 
 void CPhotoProDlg::DoDataExchange(CDataExchange* pDX)
@@ -89,9 +102,12 @@ BEGIN_MESSAGE_MAP(CPhotoProDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON3, &CPhotoProDlg::OnBnClickedLoadIMG)
 	ON_WM_MOUSEMOVE()
 	ON_BN_CLICKED(IDC_BUTTON4, &CPhotoProDlg::OnBnClickedSaveImg)
-	ON_BN_CLICKED(IDC_BUTTON5, &CPhotoProDlg::OnBnClickedButton5)
+	ON_BN_CLICKED(IDC_BUTTON5, &CPhotoProDlg::OnBnClickedDoSmooth)
 	ON_WM_LBUTTONDOWN()
 	ON_WM_LBUTTONUP()
+	ON_BN_CLICKED(IDC_BUTTON6, &CPhotoProDlg::OnBnClickedAddMosaic)
+	ON_BN_CLICKED(IDC_BUTTON12, &CPhotoProDlg::OnBnClickedUsmSharp)
+	ON_BN_CLICKED(IDC_BUTTON7, &CPhotoProDlg::OnBnClickedAllSharp)
 END_MESSAGE_MAP()
 
 
@@ -291,7 +307,7 @@ void CPhotoProDlg::OnMouseMove(UINT nFlags, CPoint point)
 		{
 			drawRectangle(point);
 		}
-		
+
 	}
 
 	CDialogEx::OnMouseMove(nFlags, point);
@@ -342,20 +358,6 @@ void CPhotoProDlg::UpdateDstImg(IplImage * modifiedImg)
 	}
 }
 
-void CPhotoProDlg::OnBnClickedButton2()
-{
-	MySmooth ms;
-	//IplImage * modifiedImg =ms.doSmooth_Gaussian(src_img);
-	MyResize mr;
-	IplImage * modifiedImg = mr.resizeByTimes(src_img,0.5);
-	UpdateDstImg(modifiedImg);
-}
-
-void CPhotoProDlg::OnBnClickedButton5()
-{
-	isChooseArea = true;
-}
-
 
 void CPhotoProDlg::OnLButtonDown(UINT nFlags, CPoint point)
 {
@@ -377,9 +379,9 @@ void CPhotoProDlg::OnLButtonUp(UINT nFlags, CPoint point)
 		isChooseArea = false;
 		isBeginDraw = false;
 		pi.setEnd_pos(point);
-		//AfxMessageBox(pi.getStart_pos().x );
-		//	/*+" y = "+ pi.getStart_pos().y+"  n"
-		//	+"end : x = "+pi.getEnd_pos().x+" y = "+ pi.getEnd_pos().y);*/
+		CPoint sp= pi.getActualSP();
+		CPoint ep=pi.getActualEP();
+		doOperation(img_OP,sp,ep);
 	}
 
 	CDialogEx::OnLButtonUp(nFlags, point);
@@ -407,4 +409,95 @@ void CPhotoProDlg::drawRectangle(CPoint point)
 
 		ReleaseDC(pDC);
 	}
+}
+
+void CPhotoProDlg::OnBnClickedButton2()
+{
+	MySmooth ms;
+	//IplImage * modifiedImg =ms.doSmooth_Gaussian(src_img);
+	MyResize mr;
+	IplImage * modifiedImg = mr.resizeByTimes(src_img,0.5);
+	UpdateDstImg(modifiedImg);
+}
+
+
+void CPhotoProDlg::OnBnClickedAllSharp()
+{
+	if (src_img == NULL)
+	{
+		AfxMessageBox("请先载入一张照片。");
+	}
+	else
+	{
+		MySharp ms;
+		IplImage * modifiedImg = ms.usmSharp(src_img);
+		UpdateDstImg(modifiedImg);
+	}
+
+}
+
+
+void CPhotoProDlg::OnBnClickedDoSmooth()
+{
+	if (src_img == NULL)
+	{
+		AfxMessageBox("请先载入一张照片。");
+	}
+	else
+	{
+		isChooseArea = true;
+		img_OP = DOSMOOTH;
+	}
+}
+
+void CPhotoProDlg::OnBnClickedAddMosaic()
+{
+	if (src_img == NULL)
+	{
+		AfxMessageBox("请先载入一张照片。");
+	}
+	else
+	{
+		img_OP = ADDMOSAIC;
+	}
+}
+
+void CPhotoProDlg::OnBnClickedUsmSharp()
+{
+	if (src_img == NULL)
+	{
+		AfxMessageBox("请先载入一张照片。");
+	}
+	else
+	{
+		isChooseArea = true;
+		img_OP = USMSHARP;
+	}
+}
+void CPhotoProDlg::doOperation( int op, CPoint sp, CPoint ep )
+{
+
+	if (op == 0)
+	{
+		AfxMessageBox("error#102# no operation!");
+	}
+	else
+	{	
+		IplImage * modifiedImg;
+		ChangePoint cp(sp,ep);
+		if (op == DOSMOOTH)
+		{
+			MySmooth ms;
+			modifiedImg =ms.partSmooth(src_img,cp.newSp.x,cp.newSp.y,cp.width,cp.height);
+
+		}
+		if (op == USMSHARP)
+		{
+			MySharp ms;
+			modifiedImg = ms.partUsmSharp(src_img,cp.newSp.x,cp.newSp.y,cp.width,cp.height);
+		}
+		UpdateDstImg(modifiedImg);
+	}
+
+
 }

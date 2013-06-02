@@ -80,3 +80,20 @@ IplImage * MySharp::usmSharp(const IplImage* src,  float amount, int radius, uch
 		cvReleaseImage(&DiffImage);
         return dst;	
 }
+
+IplImage * MySharp::partUsmSharp( IplImage*src,int x, int y, int width, int height, float amount/*=40*/, int radius/*=13*/, uchar threshold/*=2*/,float contrast/*=3*/ )
+{
+	if(src == NULL)
+	{
+		return NULL;
+	}  
+	IplImage *temp = cvCreateImage(cvGetSize(src),IPL_DEPTH_8U,3);
+	cvCopy(src,temp,NULL);
+	IplImage * dst = NULL;
+	cvSetImageROI(temp,cvRect(x,y,width,height));
+	dst = cvCreateImage(cvGetSize(temp),IPL_DEPTH_8U,3);
+	dst = usmSharp(temp,amount,radius,threshold,contrast);
+	cvCopy(dst,temp,NULL);
+	cvResetImageROI(temp);// reset
+	return temp;
+}

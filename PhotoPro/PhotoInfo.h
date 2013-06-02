@@ -23,7 +23,16 @@ public:
 
 	CPoint getEnd_pos() const { return end_pos; }
 	void setEnd_pos(CPoint val) { end_pos = val; }
+ 
+	int getDST_X() const { return DST_X; }
+	void setDST_X(int val) { DST_X = val; }
 
+	int getDST_Y() const { return DST_Y; }
+	void setDST_Y(int val) { DST_Y = val; }
+	
+	CPoint getActualSP();
+
+	CPoint getActualEP();
 private:
 	string fileExt;
 	float dstImg_Times;
@@ -31,6 +40,8 @@ private:
 	int resizeHeight;
 	CPoint start_pos;
 	CPoint end_pos;
+	int DST_X;
+	int DST_Y;
 	
 };
 

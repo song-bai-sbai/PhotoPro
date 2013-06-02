@@ -36,7 +36,7 @@ protected:
 	RECT    m_recDrawing;
 	HPEN    m_penDrawing;
 	POINT   m_ptBegin;
-
+	int img_OP;
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
@@ -49,13 +49,16 @@ public:
 	void DrawSrcImg();
 	void UpdateDstImg(IplImage * modifiedImg);
 	void drawRectangle(CPoint point);
-	
+	void doOperation(int op, CPoint sp, CPoint ep );
 	afx_msg void OnBnClickedShowIMG();
 	afx_msg void OnBnClickedButton2();
 	afx_msg void OnBnClickedLoadIMG();
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg void OnBnClickedSaveImg();
-	afx_msg void OnBnClickedButton5();
+	afx_msg void OnBnClickedDoSmooth();
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+	afx_msg void OnBnClickedAddMosaic();
+	afx_msg void OnBnClickedUsmSharp();
+	afx_msg void OnBnClickedAllSharp();
 };
