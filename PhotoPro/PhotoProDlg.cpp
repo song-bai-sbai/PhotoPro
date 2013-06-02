@@ -11,6 +11,7 @@
 #include "MyImgPro\MyResize.h"
 #include "ChangePoint.h"
 #include "MyImgPro\MySharp.h"
+#include "MyImgPro\MyAddMosaic.h"
 
 
 
@@ -108,6 +109,8 @@ BEGIN_MESSAGE_MAP(CPhotoProDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON6, &CPhotoProDlg::OnBnClickedAddMosaic)
 	ON_BN_CLICKED(IDC_BUTTON12, &CPhotoProDlg::OnBnClickedUsmSharp)
 	ON_BN_CLICKED(IDC_BUTTON7, &CPhotoProDlg::OnBnClickedAllSharp)
+	ON_BN_CLICKED(IDC_BUTTON13, &CPhotoProDlg::OnBnClickedAllBlur)
+	ON_BN_CLICKED(IDC_BUTTON10, &CPhotoProDlg::OnBnClickedButton10)
 END_MESSAGE_MAP()
 
 
@@ -378,6 +381,7 @@ void CPhotoProDlg::OnLButtonUp(UINT nFlags, CPoint point)
 	{
 		isChooseArea = false;
 		isBeginDraw = false;
+		SetRect(&m_recDrawing, 0, 0, 0,0);
 		pi.setEnd_pos(point);
 		CPoint sp= pi.getActualSP();
 		CPoint ep=pi.getActualEP();
@@ -416,21 +420,21 @@ void CPhotoProDlg::OnBnClickedButton2()
 	MySmooth ms;
 	//IplImage * modifiedImg =ms.doSmooth_Gaussian(src_img);
 	MyResize mr;
-	IplImage * modifiedImg = mr.resizeByTimes(src_img,0.5);
+	IplImage * modifiedImg = mr.resizeByTimes(dst_img,0.5);
 	UpdateDstImg(modifiedImg);
 }
 
 
 void CPhotoProDlg::OnBnClickedAllSharp()
 {
-	if (src_img == NULL)
+	if (dst_img == NULL)
 	{
 		AfxMessageBox("请先载入一张照片。");
 	}
 	else
 	{
 		MySharp ms;
-		IplImage * modifiedImg = ms.usmSharp(src_img);
+		IplImage * modifiedImg = ms.usmSharp(dst_img);
 		UpdateDstImg(modifiedImg);
 	}
 
@@ -439,7 +443,7 @@ void CPhotoProDlg::OnBnClickedAllSharp()
 
 void CPhotoProDlg::OnBnClickedDoSmooth()
 {
-	if (src_img == NULL)
+	if (dst_img == NULL)
 	{
 		AfxMessageBox("请先载入一张照片。");
 	}
@@ -450,21 +454,36 @@ void CPhotoProDlg::OnBnClickedDoSmooth()
 	}
 }
 
-void CPhotoProDlg::OnBnClickedAddMosaic()
+void CPhotoProDlg::OnBnClickedAllBlur()
 {
-	if (src_img == NULL)
+	if (dst_img == NULL)
 	{
 		AfxMessageBox("请先载入一张照片。");
 	}
 	else
 	{
+		MySmooth ms;
+		IplImage * modifiedImg = ms.doSmooth_Gaussian(dst_img);
+		UpdateDstImg(modifiedImg);
+	}
+}
+
+void CPhotoProDlg::OnBnClickedAddMosaic()
+{
+	if (dst_img == NULL)
+	{
+		AfxMessageBox("请先载入一张照片。");
+	}
+	else
+	{
+		isChooseArea = true;
 		img_OP = ADDMOSAIC;
 	}
 }
 
 void CPhotoProDlg::OnBnClickedUsmSharp()
 {
-	if (src_img == NULL)
+	if (dst_img == NULL)
 	{
 		AfxMessageBox("请先载入一张照片。");
 	}
@@ -488,16 +507,29 @@ void CPhotoProDlg::doOperation( int op, CPoint sp, CPoint ep )
 		if (op == DOSMOOTH)
 		{
 			MySmooth ms;
-			modifiedImg =ms.partSmooth(src_img,cp.newSp.x,cp.newSp.y,cp.width,cp.height);
+			modifiedImg =ms.partSmooth(dst_img,cp.newSp.x,cp.newSp.y,cp.width,cp.height);
 
 		}
 		if (op == USMSHARP)
 		{
 			MySharp ms;
-			modifiedImg = ms.partUsmSharp(src_img,cp.newSp.x,cp.newSp.y,cp.width,cp.height);
+			modifiedImg = ms.partUsmSharp(dst_img,cp.newSp.x,cp.newSp.y,cp.width,cp.height);
+		}
+		if (op == ADDMOSAIC)
+		{
+			MyAddMosaic mam;
+			modifiedImg = mam.addMosaic(dst_img,cp.newSp.x,cp.newSp.y,cp.width,cp.height);
 		}
 		UpdateDstImg(modifiedImg);
 	}
 
 
+}
+
+
+
+
+void CPhotoProDlg::OnBnClickedButton10()
+{
+	
 }

@@ -61,4 +61,6 @@ public:
 	afx_msg void OnBnClickedAddMosaic();
 	afx_msg void OnBnClickedUsmSharp();
 	afx_msg void OnBnClickedAllSharp();
+	afx_msg void OnBnClickedAllBlur();
+	afx_msg void OnBnClickedButton10();
 };
