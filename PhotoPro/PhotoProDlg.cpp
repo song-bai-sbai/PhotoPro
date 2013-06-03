@@ -12,7 +12,8 @@
 #include "ChangePoint.h"
 #include "MyImgPro\MySharp.h"
 #include "MyImgPro\MyAddMosaic.h"
-#include "..\..\opentest\opentest\MyInpaintig.h"
+#include "MyImgPro\MyInpaintig.h"
+#include "ChangeBriDlg.h"
 
 
 
@@ -113,6 +114,7 @@ BEGIN_MESSAGE_MAP(CPhotoProDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON13, &CPhotoProDlg::OnBnClickedAllBlur)
 	ON_BN_CLICKED(IDC_BUTTON10, &CPhotoProDlg::OnBnClickedButton10)
 	ON_BN_CLICKED(IDC_BUTTON11, &CPhotoProDlg::OnBnClickedRepair)
+	ON_BN_CLICKED(IDC_BUTTON8, &CPhotoProDlg::OnBnClickedChangeBri)
 END_MESSAGE_MAP()
 
 
@@ -514,6 +516,23 @@ void CPhotoProDlg::OnBnClickedRepair()
 	}
 }
 
+void CPhotoProDlg::OnBnClickedChangeBri()
+{
+	if (dst_img == NULL)
+	{
+		AfxMessageBox("请先载入一张照片。");
+	}
+	else
+	{
+		ChangeBriDlg cbdlg;
+		INT_PTR ret= cbdlg.DoModal();
+		if (ret == IDOK)
+		{
+			CString result = cbdlg.input_data;
+		}
+	}
+}
+
 void CPhotoProDlg::doOperation( int op, CPoint sp, CPoint ep )
 {
 
@@ -557,6 +576,9 @@ void CPhotoProDlg::doOperation( int op, CPoint sp, CPoint ep )
 
 void CPhotoProDlg::OnBnClickedButton10()
 {
-	
+
 }
+
+
+
 

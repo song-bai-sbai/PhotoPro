@@ -97,6 +97,9 @@
     <ClInclude Include="ChangePoint.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="ChangeBriDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PhotoPro.cpp">
@@ -157,6 +160,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="ChangePoint.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ChangeBriDlg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

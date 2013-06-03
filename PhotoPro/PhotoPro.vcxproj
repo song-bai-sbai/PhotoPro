@@ -103,6 +103,7 @@
     <None Include="res\PhotoPro.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ChangeBriDlg.h" />
     <ClInclude Include="ChangePoint.h" />
     <ClInclude Include="CvvImage.h" />
     <ClInclude Include="MyImgPro\My2DPoint.h" />
@@ -127,6 +128,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ChangeBriDlg.cpp" />
     <ClCompile Include="ChangePoint.cpp" />
     <ClCompile Include="CvvImage.cpp" />
     <ClCompile Include="MyImgPro\My2DPoint.cpp">
