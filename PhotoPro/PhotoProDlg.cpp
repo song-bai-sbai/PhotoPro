@@ -14,6 +14,10 @@
 #include "MyImgPro\MyAddMosaic.h"
 #include "MyImgPro\MyInpaintig.h"
 #include "ChangeBriDlg.h"
+#include "MyImgPro\MyBrit_Con.h"
+#include "ChangeConDlg.h"
+#include "ResizeTimesDlg.h"
+#include "ChangeByValDlg.h"
 
 
 
@@ -112,9 +116,11 @@ BEGIN_MESSAGE_MAP(CPhotoProDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON12, &CPhotoProDlg::OnBnClickedUsmSharp)
 	ON_BN_CLICKED(IDC_BUTTON7, &CPhotoProDlg::OnBnClickedAllSharp)
 	ON_BN_CLICKED(IDC_BUTTON13, &CPhotoProDlg::OnBnClickedAllBlur)
-	ON_BN_CLICKED(IDC_BUTTON10, &CPhotoProDlg::OnBnClickedButton10)
+	ON_BN_CLICKED(IDC_BUTTON10, &CPhotoProDlg::OnBnClickedResizeByTimes)
 	ON_BN_CLICKED(IDC_BUTTON11, &CPhotoProDlg::OnBnClickedRepair)
 	ON_BN_CLICKED(IDC_BUTTON8, &CPhotoProDlg::OnBnClickedChangeBri)
+	ON_BN_CLICKED(IDC_BUTTON9, &CPhotoProDlg::OnBnClickedChangeCon)
+	ON_BN_CLICKED(IDC_BUTTON15, &CPhotoProDlg::OnBnClickedResizeByVal)
 END_MESSAGE_MAP()
 
 
@@ -528,10 +534,84 @@ void CPhotoProDlg::OnBnClickedChangeBri()
 		INT_PTR ret= cbdlg.DoModal();
 		if (ret == IDOK)
 		{
-			CString result = cbdlg.input_data;
+			double adj = cbdlg.adjust_number;
+			MyBri_Con mbc;
+			IplImage * modifiedImg = mbc.adjust_bright(dst_img,adj);
+			UpdateDstImg(modifiedImg);
+		
 		}
 	}
 }
+
+
+
+
+void CPhotoProDlg::OnBnClickedChangeCon()
+{
+	if (dst_img == NULL)
+	{
+		AfxMessageBox("请先载入一张照片。");
+	}
+	else
+	{
+		ChangeConDlg ccdlg;
+		INT_PTR ret= ccdlg.DoModal();
+		if (ret == IDOK)
+		{
+			double adj = ccdlg.adjust_number;
+			MyBri_Con mbc;
+			IplImage * modifiedImg = mbc.adjust_contrast(dst_img,adj);
+			UpdateDstImg(modifiedImg);
+
+		}
+	}
+}
+
+
+void CPhotoProDlg::OnBnClickedResizeByTimes()
+{
+	if (dst_img == NULL)
+	{
+		AfxMessageBox("请先载入一张照片。");
+	}
+	else
+	{
+		ResizeTimesDlg rtdlg;
+		INT_PTR ret= rtdlg.DoModal();
+		if (ret == IDOK)
+		{
+			double adj = rtdlg.times;
+			MyResize mbc;
+			IplImage * modifiedImg = mbc.resizeByTimes(dst_img,adj);
+			UpdateDstImg(modifiedImg);
+
+		}
+	}
+}
+
+
+void CPhotoProDlg::OnBnClickedResizeByVal()
+{
+	if (dst_img == NULL)
+	{
+		AfxMessageBox("请先载入一张照片。");
+	}
+	else
+	{
+		ChangeByValDlg cbvdlg;
+		INT_PTR ret= cbvdlg.DoModal();
+		if (ret == IDOK)
+		{
+			int width = cbvdlg.width;
+			int height = cbvdlg.height;
+			MyResize mbc;
+			IplImage * modifiedImg = mbc.resizeByValue(dst_img,width,height);
+			UpdateDstImg(modifiedImg);
+
+		}
+	}
+}
+
 
 void CPhotoProDlg::doOperation( int op, CPoint sp, CPoint ep )
 {
@@ -573,11 +653,6 @@ void CPhotoProDlg::doOperation( int op, CPoint sp, CPoint ep )
 
 
 
-
-void CPhotoProDlg::OnBnClickedButton10()
-{
-
-}
 
 
 

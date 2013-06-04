@@ -10,11 +10,12 @@ class ChangeBriDlg : public CDialogEx
 public:
 	ChangeBriDlg(CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~ChangeBriDlg();
-	CString input_data;
+	double adjust_number;
 // 对话框数据
 	enum { IDD = IDD_CHANGEBRI };
 
 protected:
+	CString input_data;
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
 	DECLARE_MESSAGE_MAP()

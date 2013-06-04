@@ -12,7 +12,7 @@
 
 IMPLEMENT_DYNAMIC(ChangeBriDlg, CDialogEx)
 
-ChangeBriDlg::ChangeBriDlg(CWnd* pParent /*=NULL*/)
+	ChangeBriDlg::ChangeBriDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(ChangeBriDlg::IDD, pParent)
 {
 
@@ -24,6 +24,7 @@ ChangeBriDlg::~ChangeBriDlg()
 
 void ChangeBriDlg::DoDataExchange(CDataExchange* pDX)
 {
+	((CButton *)GetDlgItem(IDC_RADIOADDBRI))->SetCheck(true);
 	CDialogEx::DoDataExchange(pDX);
 }
 
@@ -38,6 +39,20 @@ END_MESSAGE_MAP()
 
 void ChangeBriDlg::OnBnClickedOk()
 {
-	GetDlgItem(IDC_DATA)->GetWindowText(input_data);
-	CDialogEx::OnOK();
+	GetDlgItem(IDC_BRIDATA)->GetWindowText(input_data);
+	if (input_data=="" )
+	{
+		AfxMessageBox("ÇëÊäÈëÊýÖµ¡£");
+		
+	}
+	else
+	{
+	    adjust_number = _tstof(input_data);
+		if (((CButton *)GetDlgItem(IDC_RADIOREDUCEBRI))->GetCheck())
+		{
+			adjust_number = 0- adjust_number;
+		}
+		CDialogEx::OnOK();	
+	}
+
 }

@@ -104,6 +104,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChangeBriDlg.h" />
+    <ClInclude Include="ChangeByValDlg.h" />
+    <ClInclude Include="ChangeConDlg.h" />
     <ClInclude Include="ChangePoint.h" />
     <ClInclude Include="CvvImage.h" />
     <ClInclude Include="MyImgPro\My2DPoint.h" />
@@ -123,12 +125,15 @@
     <ClInclude Include="PhotoInfo.h" />
     <ClInclude Include="PhotoPro.h" />
     <ClInclude Include="PhotoProDlg.h" />
+    <ClInclude Include="ResizeTimesDlg.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ChangeBriDlg.cpp" />
+    <ClCompile Include="ChangeByValDlg.cpp" />
+    <ClCompile Include="ChangeConDlg.cpp" />
     <ClCompile Include="ChangePoint.cpp" />
     <ClCompile Include="CvvImage.cpp" />
     <ClCompile Include="MyImgPro\My2DPoint.cpp">
@@ -176,6 +181,7 @@
     <ClCompile Include="PhotoInfo.cpp" />
     <ClCompile Include="PhotoPro.cpp" />
     <ClCompile Include="PhotoProDlg.cpp" />
+    <ClCompile Include="ResizeTimesDlg.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

@@ -62,7 +62,9 @@ public:
 	afx_msg void OnBnClickedUsmSharp();
 	afx_msg void OnBnClickedAllSharp();
 	afx_msg void OnBnClickedAllBlur();
-	afx_msg void OnBnClickedButton10();
+	afx_msg void OnBnClickedResizeByTimes();
 	afx_msg void OnBnClickedRepair();
 	afx_msg void OnBnClickedChangeBri();
+	afx_msg void OnBnClickedChangeCon();
+	afx_msg void OnBnClickedResizeByVal();
 };

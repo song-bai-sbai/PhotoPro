@@ -100,6 +100,15 @@
     <ClInclude Include="ChangeBriDlg.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="ChangeConDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ResizeTimesDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ChangeByValDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PhotoPro.cpp">
@@ -163,6 +172,15 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="ChangeBriDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ChangeConDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ResizeTimesDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ChangeByValDlg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
