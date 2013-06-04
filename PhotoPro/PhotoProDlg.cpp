@@ -18,6 +18,10 @@
 #include "ChangeConDlg.h"
 #include "ResizeTimesDlg.h"
 #include "ChangeByValDlg.h"
+#include "MyImgPro\MyClipping.h"
+#include "RotateDlg.h"
+#include "MyImgPro\MyRotate.h"
+#include "MyImgPro\MyLogo_WM.h"
 
 
 
@@ -41,6 +45,8 @@
 #define REMOVELINE 104
 #define USMSHARP 105
 #define DOSMOOTH 106
+#define ADDLOGO 107
+#define ADDWM   108
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
 class CAboutDlg : public CDialogEx
@@ -83,11 +89,13 @@ CPhotoProDlg::CPhotoProDlg(CWnd* pParent /*=NULL*/)
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	m_HArrow = AfxGetApp()->LoadStandardCursor(IDC_ARROW);
 	m_HCross = AfxGetApp()->LoadStandardCursor(IDC_CROSS);
+	m_HHand = AfxGetApp()->LoadStandardCursor(IDC_HAND);
 	src_img = NULL;
 	dst_img = NULL;
 	temp_img = NULL;
 	isChooseArea =  false;
 	isBeginDraw = false;
+	isChoosePoint = false;
 	img_OP = 0;
 	SetRectEmpty(&m_recDrawing);
 	m_penDrawing = ::CreatePen(PS_DASH, 1, RGB(255, 0, 0));
@@ -121,6 +129,11 @@ BEGIN_MESSAGE_MAP(CPhotoProDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON8, &CPhotoProDlg::OnBnClickedChangeBri)
 	ON_BN_CLICKED(IDC_BUTTON9, &CPhotoProDlg::OnBnClickedChangeCon)
 	ON_BN_CLICKED(IDC_BUTTON15, &CPhotoProDlg::OnBnClickedResizeByVal)
+	ON_BN_CLICKED(IDC_BUTTON18, &CPhotoProDlg::OnBnClickedButton18)
+	ON_BN_CLICKED(IDC_BUTTON21, &CPhotoProDlg::OnBnClickedClipping)
+	ON_BN_CLICKED(IDC_BUTTON20, &CPhotoProDlg::OnBnClickedRotate)
+	ON_BN_CLICKED(IDC_BUTTON14, &CPhotoProDlg::OnBnClickedAddLOGO)
+	ON_BN_CLICKED(IDC_BUTTON17, &CPhotoProDlg::OnBnClickedAddWM)
 END_MESSAGE_MAP()
 
 
@@ -322,7 +335,17 @@ void CPhotoProDlg::OnMouseMove(UINT nFlags, CPoint point)
 		}
 
 	}
-
+	if (isChoosePoint)
+	{
+		if (point.x>DST_X&&point.x<DST_X+pi.getResizeWidth()&&point.y>DST_Y&&point.y<DST_Y+pi.getResizeHeight())
+		{
+			SetCursor(m_HHand);
+		}
+		else
+		{
+			SetCursor(m_HArrow);
+		}
+	}
 	CDialogEx::OnMouseMove(nFlags, point);
 }
 
@@ -397,7 +420,13 @@ void CPhotoProDlg::OnLButtonUp(UINT nFlags, CPoint point)
 		CPoint ep=pi.getActualEP();
 		doOperation(img_OP,sp,ep);
 	}
-
+	if (isChoosePoint==true)
+	{
+		isChoosePoint==false;
+		pi.setEnd_pos(point);
+		CPoint ap = pi.getActualEP();
+		doOperationForPoint(img_OP,ap);
+	}
 	CDialogEx::OnLButtonUp(nFlags, point);
 }
 
@@ -613,6 +642,88 @@ void CPhotoProDlg::OnBnClickedResizeByVal()
 }
 
 
+void CPhotoProDlg::OnBnClickedClipping()
+{
+	if (dst_img == NULL)
+	{
+		AfxMessageBox("请先载入一张照片。");
+	}
+	else
+	{
+		AfxMessageBox("请选择要剪切的区域。");
+		isChooseArea = true;
+		img_OP = CLIPPING;
+	}
+}
+
+
+
+void CPhotoProDlg::OnBnClickedRotate()
+{
+	if (dst_img == NULL)
+	{
+		AfxMessageBox("请先载入一张照片。");
+	}
+	else
+	{
+		RotateDlg rotdlg;
+		INT_PTR ret= rotdlg.DoModal();
+		if (ret == IDOK)
+		{
+			double angle = rotdlg.angle;
+			MyRotate mr;
+			IplImage * modifiedImg = mr.doRotate(dst_img,angle);
+			UpdateDstImg(modifiedImg);
+		}
+	}
+}
+
+
+void CPhotoProDlg::OnBnClickedAddLOGO()
+{
+	if (dst_img == NULL)
+	{
+		AfxMessageBox("请先载入一张照片。");
+	}
+	else
+	{
+		AfxMessageBox("请选择LOGO图片路径。");
+		CFileDialog filedialog(TRUE, NULL, NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
+			"JPG,JPEG,PNG,BMP (*.jpg;*.jpeg;*.png;*.bmp)|*.jpg;*.jpeg;*.png;*.bmp|All Files (*.*)|*.*||", this);
+		if(IDOK==filedialog.DoModal())
+		{
+			logoORwm = cvLoadImage(filedialog.GetPathName(),1);
+		    AfxMessageBox("请选择要添加LOGO的位置。");
+		    isChoosePoint = true;
+		    img_OP = ADDLOGO;
+		}
+	}
+}
+
+
+
+void CPhotoProDlg::OnBnClickedAddWM()
+{
+	if (dst_img == NULL)
+	{
+		AfxMessageBox("请先载入一张照片。");
+	}
+	else
+	{
+		AfxMessageBox("请选择L水印图片路径。");
+		CFileDialog filedialog(TRUE, NULL, NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
+			"JPG,JPEG,PNG,BMP (*.jpg;*.jpeg;*.png;*.bmp)|*.jpg;*.jpeg;*.png;*.bmp|All Files (*.*)|*.*||", this);
+		if(IDOK==filedialog.DoModal())
+		{
+			logoORwm = cvLoadImage(filedialog.GetPathName(),1);
+			AfxMessageBox("请选择要添加水印的位置。");
+			isChoosePoint = true;
+			img_OP = ADDWM;
+		}
+	}
+}
+
+
 void CPhotoProDlg::doOperation( int op, CPoint sp, CPoint ep )
 {
 
@@ -645,15 +756,52 @@ void CPhotoProDlg::doOperation( int op, CPoint sp, CPoint ep )
 			MyInpaintig mi;
 			modifiedImg = mi.inpaintig(dst_img,sp.x,sp.y,sp.x,ep.y,ep.x,sp.y,ep.x,ep.y);
 		}
+		if (op == CLIPPING)
+		{
+			MyClipping mc;
+			modifiedImg = mc.clip(dst_img,cp.newSp.x,cp.newSp.y,cp.width,cp.height);
+		}
 		UpdateDstImg(modifiedImg);
 	}
 
 
+}
+void CPhotoProDlg::doOperationForPoint( int op,CPoint p )
+{
+
+	if (op == 0)
+	{
+		AfxMessageBox("error#102# no operation!");
+	}
+	else
+	{	
+		IplImage *modifiedImg = NULL;
+		if (op == ADDLOGO)
+		{
+			modifiedImg = cvCreateImage(cvGetSize(dst_img),IPL_DEPTH_8U,3);
+		    modifiedImg = cvCloneImage(dst_img);
+			MyLogo_WM mlwm;
+			mlwm.putLogoWithBack(modifiedImg,logoORwm,p.x,p.y);
+		}
+		if (op == ADDWM)
+		{
+			modifiedImg = cvCreateImage(cvGetSize(dst_img),IPL_DEPTH_8U,3);
+			modifiedImg = cvCloneImage(dst_img);
+			MyLogo_WM mlwm;
+			mlwm.putWM_img(modifiedImg,logoORwm,p.x,p.y);
+		}
+		UpdateDstImg(modifiedImg);
+	}
 }
 
 
 
 
 
+
+void CPhotoProDlg::OnBnClickedButton18()
+{
+	// TODO: 在此添加控件通知处理程序代码
+}
 
 

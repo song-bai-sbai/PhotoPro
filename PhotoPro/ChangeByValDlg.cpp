@@ -50,7 +50,7 @@ void ChangeByValDlg::OnBnClickedOk()
 	{
 		width = _tstoi(input_width);
 		height = _tstoi(input_height);
-		if (input_height<0||input_width<0)
+		if (width<0||height<0)
 		{
 			AfxMessageBox("输入错误，请重新输入。");
 		}

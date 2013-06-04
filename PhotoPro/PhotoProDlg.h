@@ -28,8 +28,11 @@ protected:
 	IplImage * src_img;
 	IplImage * temp_img;
 	IplImage * dst_img;
+	IplImage * logoORwm;
 	HCURSOR m_HArrow;
 	HCURSOR m_HCross;
+	HCURSOR m_HHand;
+	bool isChoosePoint;
 	bool isChooseArea;
 	bool isBeginDraw;
 	PhotoInfo pi;
@@ -50,6 +53,7 @@ public:
 	void UpdateDstImg(IplImage * modifiedImg);
 	void drawRectangle(CPoint point);
 	void doOperation(int op, CPoint sp, CPoint ep );
+	void doOperationForPoint(int op,CPoint p);
 	afx_msg void OnBnClickedShowIMG();
 	afx_msg void OnBnClickedButton2();
 	afx_msg void OnBnClickedLoadIMG();
@@ -67,4 +71,9 @@ public:
 	afx_msg void OnBnClickedChangeBri();
 	afx_msg void OnBnClickedChangeCon();
 	afx_msg void OnBnClickedResizeByVal();
+	afx_msg void OnBnClickedButton18();
+	afx_msg void OnBnClickedClipping();
+	afx_msg void OnBnClickedRotate();
+	afx_msg void OnBnClickedAddLOGO();
+	afx_msg void OnBnClickedAddWM();
 };

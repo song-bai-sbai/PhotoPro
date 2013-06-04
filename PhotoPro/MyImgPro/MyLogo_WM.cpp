@@ -23,6 +23,14 @@ void MyLogo_WM::putWM_img( IplImage *img,IplImage* wm_img, int pos_x, int pos_y,
 	Mat wm_imgMat(wm_img,0);
 	if (!imgMat.empty()&&!wm_imgMat.empty())
 	{
+		if (wm_imgMat.cols+pos_x>imgMat.cols)
+		{
+			pos_x= imgMat.cols-wm_imgMat.cols;
+		}
+		if (wm_imgMat.rows+pos_y>imgMat.rows)
+		{
+			pos_y = imgMat.rows-wm_imgMat.rows;
+		}
 		Mat imgROI = imgMat(Rect(pos_x,pos_y,wm_imgMat.cols,wm_imgMat.rows));
 		addWeighted(imgROI, alpha, wm_imgMat, beta, 0, imgROI);// dst = alpha* roi+ beta* src+ gamma
 	} 
@@ -43,7 +51,14 @@ void MyLogo_WM::putLogoWithBack( IplImage* img, IplImage *logo, int pos_x, int p
 {
 	Mat imgMat(img,0);
 	Mat logoMat(logo,0);
-
+	if (logoMat.cols+pos_x>imgMat.cols)
+	{
+		pos_x= imgMat.cols-logoMat.cols;
+	}
+	if (logoMat.rows+pos_y>imgMat.rows)
+	{
+		pos_y = imgMat.rows-logoMat.rows;
+	}
 	Mat imageROI = imgMat(cv::Rect(pos_x,pos_y,logoMat.cols,logoMat.rows));
 	logoMat.copyTo(imageROI);
 }
