@@ -24,6 +24,7 @@
 #include "MyImgPro\MyLogo_WM.h"
 #include "AddTextDlg.h"
 #include "MyImgPro\MyRemoveLine.h"
+#include "RemoveLineDlg.h"
 
 
 
@@ -35,7 +36,7 @@
 #define SRC_Y 10
 #define SRC_WIDTH 300
 #define SRC_HEIGHT 300
-#define DST_X 400
+#define DST_X 350
 #define DST_Y 10
 #define DST_WIDTH 600
 #define DST_HEIGHT 600
@@ -102,6 +103,7 @@ CPhotoProDlg::CPhotoProDlg(CWnd* pParent /*=NULL*/)
 	isRemove = false;
 	isBeginLine = false;
 	img_OP = 0;
+	pLeng = 0;
 	SetRectEmpty(&m_recDrawing);
 	m_penDrawing = ::CreatePen(PS_DASH, 1, RGB(255, 0, 0));
 	pi.setDST_X(DST_X);
@@ -110,6 +112,8 @@ CPhotoProDlg::CPhotoProDlg(CWnd* pParent /*=NULL*/)
 
 void CPhotoProDlg::DoDataExchange(CDataExchange* pDX)
 {
+	GetDlgItem(IDC_SrcImg)->MoveWindow(SRC_X,SRC_Y,SRC_WIDTH,SRC_HEIGHT,FALSE);
+	GetDlgItem(IDC_DstImg)->MoveWindow(DST_X,DST_Y,DST_WIDTH,DST_HEIGHT,FALSE);
 	CDialogEx::DoDataExchange(pDX);
 }
 
@@ -491,20 +495,9 @@ void CPhotoProDlg::drawRectangle(CPoint point)
 
 void CPhotoProDlg::drawLine( CPoint point )
 {
-	//CClientDC dc(this);
-	//dc.SetROP2(R2_NOT);
-	////dc.SetROP2(R2_NOTXORPEN   );  //设置绘图混合模式。
-	//CPen pen(PS_SOLID, 5, RGB(255,0,0));
-	//CPen *pOldPen = dc.SelectObject(&pen);
-
-	//dc.MoveTo(m_ptOrign);
-	//dc.LineTo(point);
-	////m_ptOrign = point;       //移动点坐标。必需的
-	////dc.SetROP2(R2_NOTXORPEN);
-	//dc.SelectObject(pOldPen);        //返还画笔
 	CClientDC dc(this);
 	dc.SetROP2(R2_NOT);
-	CPen pen(PS_SOLID, 5, RGB(255,0,0));
+	CPen pen(PS_SOLID, pLeng, RGB(255,0,0));
 	CPen *pOldPen = dc.SelectObject(&pen);
 	dc.MoveTo(pi.getStart_pos().x,pi.getStart_pos().y);
 	dc.LineTo(point.x,point.y);
@@ -818,8 +811,14 @@ void CPhotoProDlg::OnBnClickedRemoveLine()
 	}
 	else
 	{
-		isRemove = true;
-		img_OP = REMOVELINE;
+		RemoveLineDlg rldlg;
+		INT_PTR ret= rldlg.DoModal();
+		if (ret == IDOK)
+		{
+			pLeng = rldlg.pLeng;
+			isRemove = true;
+			img_OP = REMOVELINE;
+		}
 	}
 	
 }
@@ -863,11 +862,8 @@ void CPhotoProDlg::doOperation( int op, CPoint sp, CPoint ep )
 		}
 		if (op == REMOVELINE)
 		{
-			getPointForRemoveLine(sp,ep,10);
-			//MyInpaintig mi;
+			getPointForRemoveLine(sp,ep,pLeng);
 			MyRemoveLine mrl;
-			//modifiedImg = mi.inpaintig(dst_img,rm_a.x,rm_a.y,rm_c.x,rm_c.y,rm_b.x,rm_b.y,rm_d.x,rm_d.y);
-			//modifiedImg = mi.inpaintig(dst_img,11,16,11,19,79,16,79,19);
 			modifiedImg = mrl.removeLine(dst_img,rm_a.x,rm_a.y,rm_c.x,rm_c.y,rm_b.x,rm_b.y,rm_d.x,rm_d.y);
 		}
 		UpdateDstImg(modifiedImg);

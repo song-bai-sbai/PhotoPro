@@ -126,6 +126,7 @@
     <ClInclude Include="PhotoInfo.h" />
     <ClInclude Include="PhotoPro.h" />
     <ClInclude Include="PhotoProDlg.h" />
+    <ClInclude Include="RemoveLineDlg.h" />
     <ClInclude Include="ResizeTimesDlg.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="RotateDlg.h" />
@@ -184,6 +185,7 @@
     <ClCompile Include="PhotoInfo.cpp" />
     <ClCompile Include="PhotoPro.cpp" />
     <ClCompile Include="PhotoProDlg.cpp" />
+    <ClCompile Include="RemoveLineDlg.cpp" />
     <ClCompile Include="ResizeTimesDlg.cpp" />
     <ClCompile Include="RotateDlg.cpp" />
     <ClCompile Include="stdafx.cpp">

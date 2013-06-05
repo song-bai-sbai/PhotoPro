@@ -51,6 +51,7 @@ protected:
 	CPoint rm_b;
 	CPoint rm_c;
 	CPoint rm_d;
+	int pLeng;
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
