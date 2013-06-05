@@ -12,7 +12,7 @@ public:
 
 	~MyLogo_WM(void);
 
-	void putText(const IplImage* src, IplImage *dst,string text);
+	void putText(  IplImage* src, char* text,CvScalar color,int x, int y);
 	/************************************************************************/
 	/* use img as water mark												*/
 	/************************************************************************/

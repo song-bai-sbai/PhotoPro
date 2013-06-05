@@ -22,6 +22,7 @@
 #include "RotateDlg.h"
 #include "MyImgPro\MyRotate.h"
 #include "MyImgPro\MyLogo_WM.h"
+#include "AddTextDlg.h"
 
 
 
@@ -47,6 +48,7 @@
 #define DOSMOOTH 106
 #define ADDLOGO 107
 #define ADDWM   108
+#define ADDTEXT 109
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
 class CAboutDlg : public CDialogEx
@@ -134,6 +136,7 @@ BEGIN_MESSAGE_MAP(CPhotoProDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON20, &CPhotoProDlg::OnBnClickedRotate)
 	ON_BN_CLICKED(IDC_BUTTON14, &CPhotoProDlg::OnBnClickedAddLOGO)
 	ON_BN_CLICKED(IDC_BUTTON17, &CPhotoProDlg::OnBnClickedAddWM)
+	ON_BN_CLICKED(IDC_BUTTON16, &CPhotoProDlg::OnBnClickedAddText)
 END_MESSAGE_MAP()
 
 
@@ -422,7 +425,7 @@ void CPhotoProDlg::OnLButtonUp(UINT nFlags, CPoint point)
 	}
 	if (isChoosePoint==true)
 	{
-		isChoosePoint==false;
+		isChoosePoint = false;
 		pi.setEnd_pos(point);
 		CPoint ap = pi.getActualEP();
 		doOperationForPoint(img_OP,ap);
@@ -567,7 +570,7 @@ void CPhotoProDlg::OnBnClickedChangeBri()
 			MyBri_Con mbc;
 			IplImage * modifiedImg = mbc.adjust_bright(dst_img,adj);
 			UpdateDstImg(modifiedImg);
-		
+
 		}
 	}
 }
@@ -693,9 +696,9 @@ void CPhotoProDlg::OnBnClickedAddLOGO()
 		if(IDOK==filedialog.DoModal())
 		{
 			logoORwm = cvLoadImage(filedialog.GetPathName(),1);
-		    AfxMessageBox("请选择要添加LOGO的位置。");
-		    isChoosePoint = true;
-		    img_OP = ADDLOGO;
+			AfxMessageBox("请选择要添加LOGO的位置。");
+			isChoosePoint = true;
+			img_OP = ADDLOGO;
 		}
 	}
 }
@@ -723,6 +726,26 @@ void CPhotoProDlg::OnBnClickedAddWM()
 	}
 }
 
+void CPhotoProDlg::OnBnClickedAddText()
+{
+	if (dst_img == NULL)
+	{
+		AfxMessageBox("请先载入一张照片。");
+	}
+	else
+	{
+		AddTextDlg atdlg;
+		INT_PTR ret= atdlg.DoModal();
+		if (ret == IDOK)
+		{
+			inputText =  atdlg.text;
+			textColor = atdlg.color;
+			AfxMessageBox("请选择要添加文字的位置。");
+			isChoosePoint = true;
+			img_OP = ADDTEXT;
+		}
+	}
+}
 
 void CPhotoProDlg::doOperation( int op, CPoint sp, CPoint ep )
 {
@@ -779,7 +802,7 @@ void CPhotoProDlg::doOperationForPoint( int op,CPoint p )
 		if (op == ADDLOGO)
 		{
 			modifiedImg = cvCreateImage(cvGetSize(dst_img),IPL_DEPTH_8U,3);
-		    modifiedImg = cvCloneImage(dst_img);
+			modifiedImg = cvCloneImage(dst_img);
 			MyLogo_WM mlwm;
 			mlwm.putLogoWithBack(modifiedImg,logoORwm,p.x,p.y);
 		}
@@ -789,6 +812,13 @@ void CPhotoProDlg::doOperationForPoint( int op,CPoint p )
 			modifiedImg = cvCloneImage(dst_img);
 			MyLogo_WM mlwm;
 			mlwm.putWM_img(modifiedImg,logoORwm,p.x,p.y);
+		}
+		if (op == ADDTEXT)
+		{
+			modifiedImg = cvCreateImage(cvGetSize(dst_img),IPL_DEPTH_8U,3);
+			modifiedImg = cvCloneImage(dst_img);
+			MyLogo_WM mlwm;
+			mlwm.putText(modifiedImg,(LPSTR)(LPCTSTR)inputText,textColor,p.x,p.y);
 		}
 		UpdateDstImg(modifiedImg);
 	}

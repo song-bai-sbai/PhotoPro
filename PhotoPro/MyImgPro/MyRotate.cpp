@@ -18,9 +18,16 @@ IplImage * MyRotate::doRotate( IplImage *src, double angle )
 	{
 		return NULL;
 	}
-	IplImage *dst= cvCreateImage(cvGetSize(src),IPL_DEPTH_8U,3);
-
-	dst = cvCloneImage (src);
+	IplImage *dst= NULL;
+	int remain = (int)angle%90;
+	if (remain==0)
+	{
+		dst = cvCreateImage(cvSize(src->height,src->width),IPL_DEPTH_8U,3);
+	} 
+	else
+	{
+		dst= cvCreateImage(cvGetSize(src),IPL_DEPTH_8U,3);
+	}
 
 	float m[6];
 	// Matrix m looks like:
@@ -41,7 +48,7 @@ IplImage * MyRotate::doRotate( IplImage *src, double angle )
 	m[5] = h * 0.5f;
 	//  dst(x,y) = A * src(x,y) + b
 	cvZero (dst);
-	cvGetQuadrangleSubPix (src, dst, &M);
+	cvGetQuadrangleSubPix (src, dst, &M);//当函数需要图像边界外的像素点时，使用重复边界模式（replication border mode）恢复出所需的值。
 
 	return dst;
 }

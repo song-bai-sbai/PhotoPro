@@ -112,6 +112,9 @@
     <ClInclude Include="RotateDlg.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="AddTextDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PhotoPro.cpp">
@@ -187,6 +190,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="RotateDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="AddTextDlg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

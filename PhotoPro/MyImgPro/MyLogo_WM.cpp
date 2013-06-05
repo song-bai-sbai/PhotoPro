@@ -10,8 +10,18 @@ MyLogo_WM::~MyLogo_WM(void)
 {
 }
 
-void MyLogo_WM::putText( const IplImage* src, IplImage *dst,string text )
+void MyLogo_WM::putText(  IplImage* src, char* text,CvScalar color,int x, int y )
 {
+	CvFont font;
+
+	double hscale = 1.0;
+	double vscale = 1.0;
+	int linewidth = 2;
+	cvInitFont(&font,CV_FONT_HERSHEY_SIMPLEX | CV_FONT_ITALIC,hscale,vscale,0,linewidth);
+
+	CvPoint textPos =cvPoint(x, y);
+
+	cvPutText(src, text, textPos, &font,color);
 
 }
 /************************************************************************/

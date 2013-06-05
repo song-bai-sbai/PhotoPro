@@ -40,6 +40,8 @@ protected:
 	HPEN    m_penDrawing;
 	POINT   m_ptBegin;
 	int img_OP;
+	CString inputText;
+	CvScalar textColor;
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
@@ -76,4 +78,5 @@ public:
 	afx_msg void OnBnClickedRotate();
 	afx_msg void OnBnClickedAddLOGO();
 	afx_msg void OnBnClickedAddWM();
+	afx_msg void OnBnClickedAddText();
 };

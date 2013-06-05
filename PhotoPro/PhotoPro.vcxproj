@@ -103,6 +103,7 @@
     <None Include="res\PhotoPro.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AddTextDlg.h" />
     <ClInclude Include="ChangeBriDlg.h" />
     <ClInclude Include="ChangeByValDlg.h" />
     <ClInclude Include="ChangeConDlg.h" />
@@ -132,6 +133,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AddTextDlg.cpp" />
     <ClCompile Include="ChangeBriDlg.cpp" />
     <ClCompile Include="ChangeByValDlg.cpp" />
     <ClCompile Include="ChangeConDlg.cpp" />
