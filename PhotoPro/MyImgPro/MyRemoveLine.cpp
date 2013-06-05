@@ -1,4 +1,5 @@
 #include "MyRemoveLine.h"
+#include <photo\photo_c.h>
 
 
 MyRemoveLine::MyRemoveLine(void)
@@ -12,18 +13,21 @@ MyRemoveLine::~MyRemoveLine(void)
 
 IplImage * MyRemoveLine::removeLine(IplImage*src, int a_x,int a_y, int c_x, int c_y, int b_x, int b_y, int d_x, int d_y )
 {
-	img_src = cvCreateImage(cvGetSize(src),IPL_DEPTH_8U, 3);
-	cvCopy(src,img_src,NULL);
-	initVal = cvScalar(255,254,253,0);
-	getStart_line(a_x,a_y,c_x,c_y);
+	mask = cvCreateImage(cvGetSize(src),IPL_DEPTH_8U, 1);
+	cvSetZero(mask);
+	initVal = cvScalar(1,0,0,0);
+	newInit( a_x, a_y,  c_x,  c_y, d_x,  d_y, b_x,  b_y );
+	/*getStart_line(a_x,a_y,c_x,c_y);
 	getEnd_line(b_x,b_y,d_x,d_y);
-	getAllPonintAndInit();
-	list<list<My2DPoint>>::iterator it;
+	getAllPonintAndInit();*/
+	/*list<list<My2DPoint>>::iterator it;
 	for (it=allPoint.begin();it!=allPoint.end();it++)
 	{
-		reDrawCurrentLine(*it);
-	}
-	return img_src;
+	reDrawCurrentLine(*it);
+	}*/
+	IplImage * dst = cvCreateImage(cvGetSize(src),IPL_DEPTH_8U,3);
+	cvInpaint(src,mask,dst,3,CV_INPAINT_NS);
+	return dst;
 }
 
 bool MyRemoveLine::judgeInLine( int pos_x, int pos_y, int start_x, int start_y, int end_x, int end_y )
@@ -181,12 +185,12 @@ bool MyRemoveLine::getAllPonintAndInit()
 
 void MyRemoveLine::setCurrentLine_InitVal()
 {
-	if (img_src!=NULL&&!p_CurrentLine.empty())
+	if (mask!=NULL&&!p_CurrentLine.empty())
 	{
 		list<My2DPoint>::iterator it;
 		for (it=p_CurrentLine.begin();it!=p_CurrentLine.end();it++)
 		{
-			cvSet2D(img_src,it->getY(),it->getX(),initVal);
+			cvSet2D(mask,it->getY(),it->getX(),initVal);
 		}
 	}
 }
@@ -214,77 +218,77 @@ void MyRemoveLine::reDrawCurrentLine(list<My2DPoint> line)
 		//point0
 		if (it->getX()-1>=0 && it->getY()-1>0)
 		{
-			p_0 = cvGet2D(img_src,it->getY()-1>0,it->getX()-1>=0);
+			p_0 = cvGet2D(mask,it->getY()-1>0,it->getX()-1>=0);
 			addPointDiff(p_diff,p_0,p_count);
 		}
 		//point 1
 		if (it->getY()-1>=0 )
 		{
-			p_1 = cvGet2D(img_src,it->getY()-1,it->getX());
+			p_1 = cvGet2D(mask,it->getY()-1,it->getX());
 			addPointDiff(p_diff,p_1,p_count);
 		}
 
 		//point 2
-		if (it->getX()+1<img_src->width && it->getY()-1>0 )
+		if (it->getX()+1<mask->width && it->getY()-1>0 )
 		{
-			p_2 = cvGet2D(img_src,it->getY()-1,it->getX()+1);
+			p_2 = cvGet2D(mask,it->getY()-1,it->getX()+1);
 			addPointDiff(p_diff,p_2,p_count);
 		}
 
 		//point 3
 		if (it->getX()-1>=0)
 		{
-			p_3 = cvGet2D(img_src,it->getY(),it->getX()-1);
+			p_3 = cvGet2D(mask,it->getY(),it->getX()-1);
 			addPointDiff(p_diff,p_3,p_count);
 		}
 
 		//point 4
-		if (it->getX()+1<img_src->width )
+		if (it->getX()+1<mask->width )
 		{
-			p_4 = cvGet2D(img_src,it->getY(),it->getX()+1);
+			p_4 = cvGet2D(mask,it->getY(),it->getX()+1);
 			addPointDiff(p_diff,p_4,p_count);
 		}
 
 		//point 5
-		if (it->getX()-1>=0 && it->getY()+1<img_src->height)
+		if (it->getX()-1>=0 && it->getY()+1<mask->height)
 		{
-			p_5 = cvGet2D(img_src,it->getY()+1,it->getX()-1);
+			p_5 = cvGet2D(mask,it->getY()+1,it->getX()-1);
 			addPointDiff(p_diff,p_5,p_count);
 		}
 
 		//point 6
-		if (it->getY()+1<img_src->height)
+		if (it->getY()+1<mask->height)
 		{
-			p_6 = cvGet2D(img_src,it->getY()+1,it->getX());
+			p_6 = cvGet2D(mask,it->getY()+1,it->getX());
 			addPointDiff(p_diff,p_6,p_count);
 		}
 
 		//point 7
-		if (it->getX()+1<img_src->width && it->getY()+1<img_src->height )
+		if (it->getX()+1<mask->width && it->getY()+1<mask->height )
 		{
-			p_7=cvGet2D(img_src,it->getY()+1,it->getX()+1);
+			p_7=cvGet2D(mask,it->getY()+1,it->getX()+1);
 			addPointDiff(p_diff,p_7,p_count);
 		}
 
 		if (p_count == 0)
 		{
-			cvSet2D(img_src,it->getY(),it->getX(),initVal);
+			cvSet2D(mask,it->getY(),it->getX(),initVal);
 		} 
 		else
 		{
-			for (int i =0 ;i< img_src->nChannels; i++)
+			for (int i =0 ;i< mask->nChannels; i++)
 			{
 				p_diff.val[i]=p_diff.val[i]/p_count;
 			}
-			cvSet2D(img_src,it->getY(),it->getX(),p_diff);
+			cvSet2D(mask,it->getY(),it->getX(),p_diff);
 		}
-		
+
 	}
 }
 
 bool MyRemoveLine::isInitVal( CvScalar cs)
 {
-	for (int i= 0;i<img_src->nChannels;i++)
+	for (int i= 0;i<mask->nChannels;i++)
 	{
 		if (cs.val[i]!=initVal.val[i])
 		{
@@ -298,12 +302,63 @@ void MyRemoveLine::addPointDiff(CvScalar &diff,CvScalar p_x ,int &p_count)
 {
 	if (!isInitVal(p_x))
 	{
-		for(int i =0 ; i< img_src->nChannels; i++)
+		for(int i =0 ; i< mask->nChannels; i++)
 		{
 			diff.val[i]+= p_x.val[i];
 		}
 		p_count++;
 	}
+}
+
+bool MyRemoveLine::inArea(int x, int y,int a_x,int a_y, int c_x, int c_y,int d_x, int d_y, int b_x, int b_y )
+{ 
+	double dTriangle = triangleArea(a_x,a_y, c_x,c_y, x,y) + triangleArea( c_x,c_y,d_x,d_y, x,y) +  triangleArea(d_x,d_y,b_x,b_y, x,y) + triangleArea(b_x,b_y, a_x,a_y, x,y);  
+	double dQuadrangle = triangleArea(a_x,a_y, b_x,b_y, c_x,c_y) + triangleArea(c_x,c_y, d_x,d_y, b_x,b_y);  
+	return dTriangle == dQuadrangle; 
+}
+
+double MyRemoveLine::triangleArea( int a_x,int a_y, int b_x, int b_y ,int c_x, int c_y )
+{
+	double result = abs((a_x * b_y + b_x * c_y + c_x * a_y - b_x * a_y  
+		- c_x * b_y - a_x * c_y) / 2.0);  
+	return result;  
+}
+
+void MyRemoveLine::newInit(int a_x,int a_y,int c_x, int c_y, int d_x, int d_y, int b_x, int b_y )
+{
+	for (int x=0;x<mask->width;x++)
+	{
+		for (int y=0;y<mask->height;y++)
+		{
+			if (inArea(x,y, a_x, a_y,  c_x,  c_y, d_x,  d_y , b_x,  b_y ))
+			{
+				cvSet2D(mask,y,x,initVal);
+			}
+
+		}
+	}
+}
+
+bool MyRemoveLine::isIn( int x, int y,int a_x,int a_y, int c_x, int c_y, int d_x, int d_y,int b_x, int b_y  )
+{
+	double a[8] = {0};
+	a[0] = atan2(double(y-a_y),double(x-a_x));
+	a[1] = atan2(double(c_y-a_y),double(c_x-a_x));
+	a[2] = atan2(double(y-c_y),double(x-c_x));
+	a[3] = atan2(double(d_y-c_y),double(d_x-c_x));
+	a[4] = atan2(double(y-d_y),double(x-d_x));
+	a[5] = atan2(double(b_y-d_y),double(b_x-d_x));
+	a[6] = atan2(double(y-b_y),double(x-b_x));
+	a[7] = atan2(double(a_y-b_y),double(a_x-b_x));
+	int i = 0;
+	for(i = 0; i < 8; i++)
+	{
+		if(a[i]<0) a[i] = 2*3.1415926 + a[i];
+	}
+	if(a[0]>a[1]&&a[2]>a[3]&&a[4]>a[5]&&a[6]>a[7])
+		return true;
+	else
+		return false;
 }
 
 

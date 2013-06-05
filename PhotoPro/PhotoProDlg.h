@@ -35,13 +35,22 @@ protected:
 	bool isChoosePoint;
 	bool isChooseArea;
 	bool isBeginDraw;
+	bool isRemove;
+	bool isBeginLine;
 	PhotoInfo pi;
 	RECT    m_recDrawing;
 	HPEN    m_penDrawing;
 	POINT   m_ptBegin;
+	CPoint m_ptOrign;
 	int img_OP;
 	CString inputText;
 	CvScalar textColor;
+    int xOldSrc;
+	int yOldSrc;
+	CPoint rm_a;
+	CPoint rm_b;
+	CPoint rm_c;
+	CPoint rm_d;
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
@@ -54,8 +63,10 @@ public:
 	void DrawSrcImg();
 	void UpdateDstImg(IplImage * modifiedImg);
 	void drawRectangle(CPoint point);
+	void drawLine(CPoint point);
 	void doOperation(int op, CPoint sp, CPoint ep );
 	void doOperationForPoint(int op,CPoint p);
+	void getPointForRemoveLine(CPoint sp, CPoint ep, int leng);
 	afx_msg void OnBnClickedShowIMG();
 	afx_msg void OnBnClickedButton2();
 	afx_msg void OnBnClickedLoadIMG();
@@ -73,7 +84,7 @@ public:
 	afx_msg void OnBnClickedChangeBri();
 	afx_msg void OnBnClickedChangeCon();
 	afx_msg void OnBnClickedResizeByVal();
-	afx_msg void OnBnClickedButton18();
+	afx_msg void OnBnClickedRemoveLine();
 	afx_msg void OnBnClickedClipping();
 	afx_msg void OnBnClickedRotate();
 	afx_msg void OnBnClickedAddLOGO();

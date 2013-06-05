@@ -36,6 +36,14 @@ private:
 	bool isInitVal( CvScalar cs);
 
 	void addPointDiff(CvScalar &diff,CvScalar p_x ,int &p_count);
+	
+	void newInit(int a_x,int a_y, int c_x, int c_y, int b_x, int b_y, int d_x, int d_y ); 
+
+	bool inArea(int x, int y,int a_x,int a_y, int c_x, int c_y, int b_x, int b_y, int d_x, int d_y);
+
+	bool isIn(int x, int y,int a_x,int a_y, int c_x, int c_y, int b_x, int b_y, int d_x, int d_y);
+
+	double triangleArea(int a_x,int a_y, int c_x, int c_y, int b_x, int b_y);
 
 	list<My2DPoint> p_StartLine;
 
@@ -45,7 +53,9 @@ private:
 	
 	list<list<My2DPoint>> allPoint;
 
-	IplImage * img_src;
+	list<My2DPoint> rePoint;
+
+	IplImage * mask;
 
 	CvScalar initVal;
 };

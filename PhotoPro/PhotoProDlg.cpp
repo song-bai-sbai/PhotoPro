@@ -23,6 +23,7 @@
 #include "MyImgPro\MyRotate.h"
 #include "MyImgPro\MyLogo_WM.h"
 #include "AddTextDlg.h"
+#include "MyImgPro\MyRemoveLine.h"
 
 
 
@@ -98,6 +99,8 @@ CPhotoProDlg::CPhotoProDlg(CWnd* pParent /*=NULL*/)
 	isChooseArea =  false;
 	isBeginDraw = false;
 	isChoosePoint = false;
+	isRemove = false;
+	isBeginLine = false;
 	img_OP = 0;
 	SetRectEmpty(&m_recDrawing);
 	m_penDrawing = ::CreatePen(PS_DASH, 1, RGB(255, 0, 0));
@@ -131,7 +134,7 @@ BEGIN_MESSAGE_MAP(CPhotoProDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON8, &CPhotoProDlg::OnBnClickedChangeBri)
 	ON_BN_CLICKED(IDC_BUTTON9, &CPhotoProDlg::OnBnClickedChangeCon)
 	ON_BN_CLICKED(IDC_BUTTON15, &CPhotoProDlg::OnBnClickedResizeByVal)
-	ON_BN_CLICKED(IDC_BUTTON18, &CPhotoProDlg::OnBnClickedButton18)
+	ON_BN_CLICKED(IDC_BUTTON18, &CPhotoProDlg::OnBnClickedRemoveLine)
 	ON_BN_CLICKED(IDC_BUTTON21, &CPhotoProDlg::OnBnClickedClipping)
 	ON_BN_CLICKED(IDC_BUTTON20, &CPhotoProDlg::OnBnClickedRotate)
 	ON_BN_CLICKED(IDC_BUTTON14, &CPhotoProDlg::OnBnClickedAddLOGO)
@@ -322,7 +325,7 @@ void CPhotoProDlg::OnBnClickedLoadIMG()//load img
 
 void CPhotoProDlg::OnMouseMove(UINT nFlags, CPoint point)
 {
-	if (isChooseArea)
+	if (isChooseArea||isRemove)
 	{
 		if (point.x>DST_X&&point.x<DST_X+pi.getResizeWidth()&&point.y>DST_Y&&point.y<DST_Y+pi.getResizeHeight())
 		{
@@ -335,6 +338,10 @@ void CPhotoProDlg::OnMouseMove(UINT nFlags, CPoint point)
 		if (isBeginDraw)
 		{
 			drawRectangle(point);
+		}
+		if (isBeginLine)
+		{
+			drawLine(point);
 		}
 
 	}
@@ -406,7 +413,14 @@ void CPhotoProDlg::OnLButtonDown(UINT nFlags, CPoint point)
 		m_ptBegin = point;
 		pi.setStart_pos(point);
 	}
-
+	if (isRemove == true)
+	{
+		m_ptOrign = point;
+		pi.setStart_pos(point);
+		isBeginLine = true;
+		xOldSrc = point.x;
+		yOldSrc = point.y;
+	}
 	CDialogEx::OnLButtonDown(nFlags, point);
 }
 
@@ -429,6 +443,24 @@ void CPhotoProDlg::OnLButtonUp(UINT nFlags, CPoint point)
 		pi.setEnd_pos(point);
 		CPoint ap = pi.getActualEP();
 		doOperationForPoint(img_OP,ap);
+	}
+	if (isRemove == true)
+	{
+		isRemove = false;
+		isBeginLine = false;
+		pi.setEnd_pos(point);
+		
+		CClientDC dc(this);
+		dc.SetROP2(R2_NOT);
+		CPen pen(PS_SOLID, 5, RGB(255,0,0));
+		CPen *pOldPen = dc.SelectObject(&pen);
+		dc.MoveTo(pi.getStart_pos().x,pi.getStart_pos().y);//---- 擦除上次的线条
+		dc.LineTo(xOldSrc,yOldSrc);
+		dc.SelectObject(pOldPen);
+
+		CPoint sp= pi.getActualSP();
+		CPoint ep=pi.getActualEP();
+		doOperation(img_OP,sp,ep);
 	}
 	CDialogEx::OnLButtonUp(nFlags, point);
 }
@@ -455,6 +487,35 @@ void CPhotoProDlg::drawRectangle(CPoint point)
 
 		ReleaseDC(pDC);
 	}
+}
+
+void CPhotoProDlg::drawLine( CPoint point )
+{
+	//CClientDC dc(this);
+	//dc.SetROP2(R2_NOT);
+	////dc.SetROP2(R2_NOTXORPEN   );  //设置绘图混合模式。
+	//CPen pen(PS_SOLID, 5, RGB(255,0,0));
+	//CPen *pOldPen = dc.SelectObject(&pen);
+
+	//dc.MoveTo(m_ptOrign);
+	//dc.LineTo(point);
+	////m_ptOrign = point;       //移动点坐标。必需的
+	////dc.SetROP2(R2_NOTXORPEN);
+	//dc.SelectObject(pOldPen);        //返还画笔
+	CClientDC dc(this);
+	dc.SetROP2(R2_NOT);
+	CPen pen(PS_SOLID, 5, RGB(255,0,0));
+	CPen *pOldPen = dc.SelectObject(&pen);
+	dc.MoveTo(pi.getStart_pos().x,pi.getStart_pos().y);
+	dc.LineTo(point.x,point.y);
+
+	dc.MoveTo(pi.getStart_pos().x,pi.getStart_pos().y);//---- 擦除上次的线条
+	dc.LineTo(xOldSrc,yOldSrc);
+
+
+	xOldSrc=point.x;
+	yOldSrc=point.y;
+	dc.SelectObject(pOldPen);
 }
 
 void CPhotoProDlg::OnBnClickedButton2()
@@ -747,6 +808,22 @@ void CPhotoProDlg::OnBnClickedAddText()
 	}
 }
 
+
+
+void CPhotoProDlg::OnBnClickedRemoveLine()
+{
+	if (dst_img == NULL)
+	{
+		AfxMessageBox("请先载入一张照片。");
+	}
+	else
+	{
+		isRemove = true;
+		img_OP = REMOVELINE;
+	}
+	
+}
+
 void CPhotoProDlg::doOperation( int op, CPoint sp, CPoint ep )
 {
 
@@ -783,6 +860,15 @@ void CPhotoProDlg::doOperation( int op, CPoint sp, CPoint ep )
 		{
 			MyClipping mc;
 			modifiedImg = mc.clip(dst_img,cp.newSp.x,cp.newSp.y,cp.width,cp.height);
+		}
+		if (op == REMOVELINE)
+		{
+			getPointForRemoveLine(sp,ep,10);
+			//MyInpaintig mi;
+			MyRemoveLine mrl;
+			//modifiedImg = mi.inpaintig(dst_img,rm_a.x,rm_a.y,rm_c.x,rm_c.y,rm_b.x,rm_b.y,rm_d.x,rm_d.y);
+			//modifiedImg = mi.inpaintig(dst_img,11,16,11,19,79,16,79,19);
+			modifiedImg = mrl.removeLine(dst_img,rm_a.x,rm_a.y,rm_c.x,rm_c.y,rm_b.x,rm_b.y,rm_d.x,rm_d.y);
 		}
 		UpdateDstImg(modifiedImg);
 	}
@@ -824,14 +910,53 @@ void CPhotoProDlg::doOperationForPoint( int op,CPoint p )
 	}
 }
 
-
-
-
-
-
-void CPhotoProDlg::OnBnClickedButton18()
+void CPhotoProDlg::getPointForRemoveLine(CPoint sp, CPoint ep, int leng)
 {
-	// TODO: 在此添加控件通知处理程序代码
+	leng = leng/pi.getDstImg_Times();
+	rm_a.x=sp.x-leng;
+	rm_a.y=sp.y-leng;
+	rm_c.x=sp.x-leng;
+	rm_c.y=sp.y+leng;
+	rm_b.x=ep.x+leng;
+	rm_b.y=ep.y-leng;
+	rm_d.x=ep.x+leng;
+	rm_d.y=ep.y+leng;
+	if (rm_a.x<0)
+	{
+		rm_a.x=0;
+		rm_c.x=0;
+	}
+	if (rm_a.y<0)
+	{
+		rm_a.y=0;
+		rm_c.y=0+leng*2;
+	}
+	if (rm_c.y>(0+dst_img->height))
+	{
+		rm_c.y=0+dst_img->height;
+		rm_a.y=0+dst_img->height-leng*2;
+	}
+	if (rm_b.x>(0+dst_img->width))
+	{
+		rm_b.x=0+dst_img->width;
+		rm_d.x=0+dst_img->width;
+	}
+	if (rm_b.y<0) 
+	{
+		rm_b.y=0;
+		rm_d.y=0+leng*2;
+	}
+	if (rm_d.y>(0+dst_img->height))
+	{
+		rm_d.y=0+dst_img->height;
+		rm_b.y=0+dst_img->height-leng*2;
+	}
+
 }
+
+
+
+
+
 
 
