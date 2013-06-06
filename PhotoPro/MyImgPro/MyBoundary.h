@@ -10,6 +10,6 @@ public:
 	/************************************************************************/
 	/* add boundary                                                         */
 	/************************************************************************/
-	void addBoundary(IplImage * src, IplImage *back, int start_x, int start_y,int width, int height);
+	void addBoundary(IplImage * src, IplImage *back,int start_x, int start_y,int width, int height);
 };
 

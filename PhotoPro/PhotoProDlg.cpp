@@ -25,6 +25,8 @@
 #include "AddTextDlg.h"
 #include "MyImgPro\MyRemoveLine.h"
 #include "RemoveLineDlg.h"
+#include "MyImgPro\MyBoundary.h"
+#include "AddBundaryDlg.h"
 
 
 
@@ -32,14 +34,14 @@
 #define new DEBUG_NEW
 #endif
 
-#define SRC_X 10
+#define SRC_X 100
 #define SRC_Y 10
 #define SRC_WIDTH 300
 #define SRC_HEIGHT 300
-#define DST_X 350
+#define DST_X 410
 #define DST_Y 10
-#define DST_WIDTH 600
-#define DST_HEIGHT 600
+#define DST_WIDTH 550
+#define DST_HEIGHT 550
 
 //Operation
 #define ADDMOSAIC 101
@@ -122,7 +124,7 @@ BEGIN_MESSAGE_MAP(CPhotoProDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BUTTON1, &CPhotoProDlg::OnBnClickedShowIMG)
-	ON_BN_CLICKED(IDC_BUTTON2, &CPhotoProDlg::OnBnClickedButton2)
+	ON_BN_CLICKED(IDC_BUTTON2, &CPhotoProDlg::OnBnClickedUnDo)
 	ON_BN_CLICKED(IDC_BUTTON3, &CPhotoProDlg::OnBnClickedLoadIMG)
 	ON_WM_MOUSEMOVE()
 	ON_BN_CLICKED(IDC_BUTTON4, &CPhotoProDlg::OnBnClickedSaveImg)
@@ -144,6 +146,7 @@ BEGIN_MESSAGE_MAP(CPhotoProDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON14, &CPhotoProDlg::OnBnClickedAddLOGO)
 	ON_BN_CLICKED(IDC_BUTTON17, &CPhotoProDlg::OnBnClickedAddWM)
 	ON_BN_CLICKED(IDC_BUTTON16, &CPhotoProDlg::OnBnClickedAddText)
+	ON_BN_CLICKED(IDC_BUTTON19, &CPhotoProDlg::OnBnClickedAddBun)
 END_MESSAGE_MAP()
 
 
@@ -453,7 +456,7 @@ void CPhotoProDlg::OnLButtonUp(UINT nFlags, CPoint point)
 		isRemove = false;
 		isBeginLine = false;
 		pi.setEnd_pos(point);
-		
+
 		CClientDC dc(this);
 		dc.SetROP2(R2_NOT);
 		CPen pen(PS_SOLID, 5, RGB(255,0,0));
@@ -511,13 +514,18 @@ void CPhotoProDlg::drawLine( CPoint point )
 	dc.SelectObject(pOldPen);
 }
 
-void CPhotoProDlg::OnBnClickedButton2()
+void CPhotoProDlg::OnBnClickedUnDo()
 {
-	MySmooth ms;
-	//IplImage * modifiedImg =ms.doSmooth_Gaussian(src_img);
-	MyResize mr;
-	IplImage * modifiedImg = mr.resizeByTimes(dst_img,0.5);
-	UpdateDstImg(modifiedImg);
+	if (dst_img == NULL)
+	{
+		AfxMessageBox("请先载入一张照片。");
+	}
+	else
+	{
+		IplImage * modifiedImg = cvCreateImage(cvGetSize(temp_img),IPL_DEPTH_8U,3);
+		modifiedImg = cvCloneImage(temp_img);
+		UpdateDstImg(modifiedImg);
+	}
 }
 
 
@@ -767,7 +775,7 @@ void CPhotoProDlg::OnBnClickedAddWM()
 	}
 	else
 	{
-		AfxMessageBox("请选择L水印图片路径。");
+		AfxMessageBox("请选择水印图片路径。");
 		CFileDialog filedialog(TRUE, NULL, NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
 			"JPG,JPEG,PNG,BMP (*.jpg;*.jpeg;*.png;*.bmp)|*.jpg;*.jpeg;*.png;*.bmp|All Files (*.*)|*.*||", this);
 		if(IDOK==filedialog.DoModal())
@@ -820,8 +828,34 @@ void CPhotoProDlg::OnBnClickedRemoveLine()
 			img_OP = REMOVELINE;
 		}
 	}
-	
+
 }
+
+
+
+
+void CPhotoProDlg::OnBnClickedAddBun()
+{
+	if (dst_img == NULL)
+	{
+		AfxMessageBox("请先载入一张照片。");
+	}
+	else
+	{
+		AddBundaryDlg abdlg;
+		INT_PTR ret= abdlg.DoModal();
+		if (ret == IDOK)
+		{
+			MyBoundary mb;
+			IplImage * modifiedImg = cvLoadImage((LPSTR)(LPCTSTR)abdlg.name,1);
+			mb.addBoundary(dst_img,modifiedImg, abdlg.sx,abdlg.sy,abdlg.width,abdlg.height);
+			UpdateDstImg(modifiedImg);
+
+		}
+
+	}
+}
+
 
 void CPhotoProDlg::doOperation( int op, CPoint sp, CPoint ep )
 {
@@ -949,7 +983,6 @@ void CPhotoProDlg::getPointForRemoveLine(CPoint sp, CPoint ep, int leng)
 	}
 
 }
-
 
 
 

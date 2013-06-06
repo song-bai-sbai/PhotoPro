@@ -69,7 +69,7 @@ public:
 	void doOperationForPoint(int op,CPoint p);
 	void getPointForRemoveLine(CPoint sp, CPoint ep, int leng);
 	afx_msg void OnBnClickedShowIMG();
-	afx_msg void OnBnClickedButton2();
+	afx_msg void OnBnClickedUnDo();
 	afx_msg void OnBnClickedLoadIMG();
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg void OnBnClickedSaveImg();
@@ -91,4 +91,5 @@ public:
 	afx_msg void OnBnClickedAddLOGO();
 	afx_msg void OnBnClickedAddWM();
 	afx_msg void OnBnClickedAddText();
+	afx_msg void OnBnClickedAddBun();
 };
