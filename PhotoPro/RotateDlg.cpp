@@ -47,10 +47,6 @@ void RotateDlg::OnBnClickedOk()
 	else
 	{
 		angle = _tstof(input_data);
-		if (angle<0)
-		{
-			AfxMessageBox("输入错误，请重新输入。");
-		}
 		CDialogEx::OnOK();	
 	}
 }
