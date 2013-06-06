@@ -11,6 +11,16 @@
 #define BK1_WIDTH 529
 #define BK1_HEIGHT 519
 #define BK1_NAME "bk/bk1.jpg"
+#define BK2_X 101
+#define BK2_Y 118
+#define BK2_WIDTH 407
+#define BK2_HEIGHT 417
+#define BK2_NAME "bk/bk2.jpg"
+#define BK3_X 109
+#define BK3_Y 134
+#define BK3_WIDTH 375
+#define BK3_HEIGHT 328
+#define BK3_NAME "bk/bk3.jpg"
 // AddBundaryDlg ¶Ô»°¿ò
 
 IMPLEMENT_DYNAMIC(AddBundaryDlg, CDialogEx)
@@ -52,9 +62,19 @@ void AddBundaryDlg::OnBnClickedOk()
 	}
 	if (((CButton *)GetDlgItem(IDC_BUN2))->GetCheck())
 	{
+		sx = BK2_X;
+		sy = BK2_Y;
+		width = BK2_WIDTH;
+		height = BK2_HEIGHT;
+		name = BK2_NAME;
 	}
 	if (((CButton *)GetDlgItem(IDC_BUN3))->GetCheck())
 	{
+		sx = BK3_X;
+		sy = BK3_Y;
+		width = BK3_WIDTH;
+		height = BK3_HEIGHT;
+		name = BK3_NAME;
 	}
 	CDialogEx::OnOK();
 }
