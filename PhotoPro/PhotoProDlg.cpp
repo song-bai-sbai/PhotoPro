@@ -892,7 +892,7 @@ void CPhotoProDlg::doOperation( int op, CPoint sp, CPoint ep )
 		if (op == CLIPPING)
 		{
 			MyClipping mc;
-			modifiedImg = mc.clip(dst_img,cp.newSp.x,cp.newSp.y,cp.width,cp.height);
+			modifiedImg = mc.clip(dst_img,cp.newSp.x,cp.newSp.y,cp.newSp.x+cp.width,cp.newSp.y+cp.height);
 		}
 		if (op == REMOVELINE)
 		{
